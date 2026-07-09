@@ -9,6 +9,7 @@ _G.CurrentAutoAttackId = currentScriptId
 
 local MAX_DISTANCE = 5
 local ATTACK_COOLDOWN = 1
+local TARGET_TEAM_NAME = "Killer"
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -16,6 +17,28 @@ local LocalPlayer = Players.LocalPlayer
 
 local AttackRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Attacks"):WaitForChild("BasicAttack")
 local args = { false }
+
+local function isCarryingSomething(character)
+	if not character then return false end
+	
+	-- Проверка, если IsCarrying это BoolValue внутри персонажа
+	local carryingValue = character:FindFirstChild("IsCarrying")
+	if carryingValue and carryingValue:IsA("BoolValue") then
+		return carryingValue.Value
+	end
+	
+	local carryingAttribute = character:GetAttribute("IsCarrying")
+	if carryingAttribute ~= nil then
+		return carryingAttribute
+	end
+	
+	local success, result = pcall(function() return character.IsCarrying end)
+	if success and type(result) == "boolean" then
+		return result
+	end
+
+	return false
+end
 
 local function getClosestPlayer()
 	local closestPlayer = nil
@@ -49,14 +72,17 @@ end
 
 task.spawn(function()
 	while _G.AutoAttackScriptRunning and _G.CurrentAutoAttackId == currentScriptId do
-		if _G.AutoAttackKiller == true then
+		local onCorrectTeam = LocalPlayer.Team and LocalPlayer.Team.Name == TARGET_TEAM_NAME
+		local carrying = isCarryingSomething(LocalPlayer.Character)
+
+		if _G.AutoAttackKiller == true and onCorrectTeam and not carrying then
 			local target = getClosestPlayer()
 			if target then
 				AttackRemote:FireServer(unpack(args))
 			end
 			task.wait(ATTACK_COOLDOWN)
 		else
-			task.wait(0.2)
+			task.wait(0.1)
 		end
 	end
 end)
