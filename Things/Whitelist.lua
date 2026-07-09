@@ -1,4 +1,4 @@
-local Players = game:GetService("Players") ---ewqewqe
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 if _G.PlayerListUpdaterRunning then
@@ -13,23 +13,23 @@ _G.SelectedPlayer = _G.SelectedPlayer or nil
 
 local function updatePlayerList()
     local newList = {}
-    
+   
     for _, plr in ipairs(Players:GetPlayers()) do
         if plr ~= Players.LocalPlayer then
             table.insert(newList, plr.Name)
         end
     end
-    
+   
     table.sort(newList)
     _G.PlayerList = newList
-    
+   
     print("[PlayerUpdater] Обновлено: " .. #newList .. " игроков")
 end
 
 updatePlayerList()
 
 RunService.Heartbeat:Connect(function()
-    if tick() % 5 < 0.1 then
+    if tick() % 5 < 0.05 then
         updatePlayerList()
     end
 end)
