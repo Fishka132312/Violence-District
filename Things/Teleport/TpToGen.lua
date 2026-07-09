@@ -1,12 +1,10 @@
-local SCRIPT_TAG = "GenTeleport" 
+local SCRIPT_TAG = "GenTeleport"
 
 if _G[SCRIPT_TAG] then
     _G[SCRIPT_TAG]()
 end
 
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-
 local LocalPlayer = Players.LocalPlayer
 
 local function getMapFolder()
@@ -28,59 +26,61 @@ local function findAllGenerators()
     return generators
 end
 
-local function teleportToRandomGenerator()
+if _G.GenCycleIndex == nil then
+    _G.GenCycleIndex = 1
+end
+
+local function teleportToNextGenerator()
     local generators = findAllGenerators()
     
     if #generators == 0 then
-        print("❌ Генераторы не найдены на карте!")
-        return false
+        print("❌ Генераторы не найдены!")
+        return
     end
     
-    local randomGen = generators[math.random(1, #generators)]
+    local currentIndex = _G.GenCycleIndex
+    local targetGen = generators[currentIndex]
     
-    local rootPart = randomGen:IsA("Model") and 
-        (randomGen.PrimaryPart or randomGen:FindFirstChildWhichIsA("BasePart")) or 
-        randomGen
+    local rootPart = targetGen:IsA("Model") and 
+        (targetGen.PrimaryPart or targetGen:FindFirstChildWhichIsA("BasePart")) or 
+        targetGen
     
     if not rootPart then
-        print("⚠️ У выбранного генератора нет PrimaryPart")
-        return false
+        print("⚠️ Проблема с генератором #" .. currentIndex)
+        _G.GenCycleIndex = (_G.GenCycleIndex % #generators) + 1
+        return
     end
     
     local character = LocalPlayer.Character
-    if not character then 
-        print("⚠️ Персонаж не загружен")
-        return false 
+    if not character or not character:FindFirstChild("HumanoidRootPart") then
+        print("⚠️ Персонаж не готов")
+        return
     end
     
-    local humanoidRoot = character:FindFirstChild("HumanoidRootPart")
-    if not humanoidRoot then 
-        print("⚠️ HumanoidRootPart не найден")
-        return false 
-    end
+    local hrp = character.HumanoidRootPart
+    hrp.CFrame = rootPart.CFrame * CFrame.new(0, 5, 0)  -- чуть выше
     
-    local targetCFrame = rootPart.CFrame * CFrame.new(0, 4, 0)
-    humanoidRoot.CFrame = targetCFrame
+    print(string.format("📍 Телепорт %d/%d → Генератор #%d", 
+        currentIndex, #generators, currentIndex))
     
-    print("✅ Телепортирован к генератору! (Всего генераторов: " .. #generators .. ")")
-    return true
+    _G.GenCycleIndex = (_G.GenCycleIndex % #generators) + 1
 end
 
-print("[GEN TELEPORT] Ищем генераторы...")
-local success = teleportToRandomGenerator()
-
 local function cleanup()
-    print("[GEN TELEPORT] Скрипт выгружен")
+    print("🧹 Цикличный телепорт к генераторам выгружен")
+    _G.GenCycleIndex = nil
 end
 
 _G[SCRIPT_TAG] = cleanup
 
-print("Напиши `teleportgen` в чат, чтобы телепортироваться снова.")
-local connection
-connection = LocalPlayer.Chatted:Connect(function(msg)
-    if msg:lower() == "teleportgen" or msg:lower() == "gen" then
-        teleportToRandomGenerator()
+print("🔄 Цикличный телепорт к генераторам загружен!")
+print("Напиши в чат `nextgen` или `gen` для телепорта к следующему генератору")
+
+local chatConnection = LocalPlayer.Chatted:Connect(function(msg)
+    local text = msg:lower()
+    if text == "nextgen" or text == "gen" or text == "next" then
+        teleportToNextGenerator()
     end
 end)
 
-_G[SCRIPT_TAG .. "_chat"] = connection
+_G[SCRIPT_TAG .. "_chat"] = chatConnection
