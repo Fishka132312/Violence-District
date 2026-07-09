@@ -1,4 +1,4 @@
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---ццццццц
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---xxxxx
 local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = false, SaveConfig = true, ConfigFolder = "Violence District meowl"})
 
 local scripts = {
@@ -120,11 +120,11 @@ local Section = Tab:AddSection({
 
 local PlayerDropdown = Tab:AddDropdown({
     Name = "Choose Player",
-    Default = nil,
+    Default = "Загрузка игроков...",
     Options = {"Загрузка игроков..."},
     Callback = function(Value)
         _G.SelectedPlayer = Value
-        print("Choosed: " .. Value)
+        print("Выбран: " .. Value)
     end
 })
 
@@ -132,71 +132,46 @@ Tab:AddButton({
     Name = "Add / Remove Whitelist",
     Callback = function()
         local selected = _G.SelectedPlayer
-     
         if not selected or selected == "Загрузка игроков..." or selected == "Нет игроков" then
-            print("❌ Choose Player")
+            print("❌ Сначала выбери игрока")
             return
         end
-       
+      
         local index = table.find(_G.Whitelist, selected)
-     
+    
         if index then
             table.remove(_G.Whitelist, index)
-            print("➖ " .. selected .. " removed from whitelist")
+            print("➖ " .. selected .. " удалён из whitelist")
         else
             table.insert(_G.Whitelist, selected)
-            print("✅ " .. selected .. " added to whitelist")
+            print("✅ " .. selected .. " добавлен в whitelist")
         end
     end
 })
 
-local LastPlayerHash = ""
-
-local function UpdatePlayerDropdown()
-    if not PlayerDropdown or typeof(PlayerDropdown.Refresh) ~= "function" then
-        return
-    end
-
-    local options = _G.PlayerList or {}
-    
-    if #options == 0 then
-        options = {"Нет игроков"}
-    else
-        local unique = {}
-        for _, name in ipairs(options) do
-            unique[name] = true
+Tab:AddButton({
+    Name = "🔄 Refresh List",
+    Callback = function()
+        local options = _G.PlayerList or {}
+        
+        if #options == 0 then
+            options = {"Нет игроков"}
+        else
+            local unique = {}
+            for _, name in ipairs(options) do
+                unique[name] = true
+            end
+            options = {}
+            for name in pairs(unique) do
+                table.insert(options, name)
+            end
+            table.sort(options)
         end
-        options = {}
-        for name in pairs(unique) do
-            table.insert(options, name)
-        end
-        table.sort(options)
+        
+        PlayerDropdown:Refresh(options)
+        print("✅ Список игроков обновлён (" .. #options .. " игроков)")
     end
-
-    local currentHash = table.concat(options, ",")
-    if currentHash == LastPlayerHash then
-        return
-    end
-
-    LastPlayerHash = currentHash
-    PlayerDropdown:Refresh(options)
-
-    if _G.SelectedPlayer and table.find(options, _G.SelectedPlayer) then
-        PlayerDropdown:Set(_G.SelectedPlayer)
-    end
-end
-
-task.spawn(function()
-    while true do
-        task.wait(2.5)
-        UpdatePlayerDropdown()
-    end
-end)
-
-Players.PlayerAdded:Connect(UpdatePlayerDropdown)
-Players.PlayerRemoving:Connect(UpdatePlayerDropdown)
-
-task.delay(1, UpdatePlayerDropdown)
+})
 
 Tab:AddToggle({
 	Name = "Auto Attack",
