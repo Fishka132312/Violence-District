@@ -1,6 +1,4 @@
--- EmoteLoader (LocalScript)
-
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage") --5434234234
 local Players = game:GetService("Players")
 
 local player = Players.LocalPlayer
@@ -24,9 +22,10 @@ local function playEmote(emoteName)
         return false
     end
 
-    local animId = emoteFolder:GetAttribute("AnimationId")
+    local animId = emoteFolder:GetAttribute("animationid")
+    
     if not animId then
-        warn("AnimationId attribute not found in:", emoteName)
+        warn("Attribute 'animationid' not found in emote:", emoteName)
         return false
     end
 
@@ -38,7 +37,7 @@ local function playEmote(emoteName)
     currentTrack:Play()
 
     currentEmoteName = emoteName
-    print("Playing emote:", emoteName, "ID:", animId)
+    print("✅ Playing emote:", emoteName, "| ID:", animId)
     return true
 end
 
@@ -47,7 +46,7 @@ local function stopEmote()
         currentTrack:Stop()
         currentTrack = nil
         currentEmoteName = nil
-        print("Emote stopped")
+        print("⛔ Emote stopped")
     end
 end
 
@@ -63,5 +62,3 @@ getgenv().GetAllEmotes = function()
     table.sort(list)
     return list
 end
-
-print("Emote Loader loaded successfully!")
