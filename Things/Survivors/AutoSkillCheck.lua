@@ -1,110 +1,71 @@
-local TweenService = game:GetService("TweenService")
+-- // Auto Skill Check - Идеальное попадание
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
-local CollectionService = game:GetService("CollectionService")
 
 local player = game.Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-
 local SkillCheckEvent = ReplicatedStorage.Remotes.Generator:WaitForChild("SkillCheckEvent")
-local SkillCheckResultEvent = ReplicatedStorage.Remotes.Generator:WaitForChild("SkillCheckResultEvent")
+local SkillCheckResult = ReplicatedStorage.Remotes.Generator:WaitForChild("SkillCheckResultEvent")
 
-local KingScourgeStart = ReplicatedStorage.Remotes.KillerPerks.kingscourge:WaitForChild("KingScourgeStart")
-local KingScourgeHit = ReplicatedStorage.Remotes.KillerPerks.kingscourge:WaitForChild("KingScourgeHit")
-local KingScourgeEnd = ReplicatedStorage.Remotes.KillerPerks.kingscourge:WaitForChild("KingScourgeEnd")
+local KingStart = ReplicatedStorage.Remotes.KillerPerks.kingscourge:WaitForChild("KingScourgeStart")
+local KingEnd = ReplicatedStorage.Remotes.KillerPerks.kingscourge:WaitForChild("KingScourgeEnd")
 
-local ProgressPrompt = playerGui:WaitForChild("ProgressPromptGui").Frame
-local SkillCheckGui = playerGui:WaitForChild("SkillCheckPromptGui").Check
-local Line = SkillCheckGui:WaitForChild("Line")
-local Goal = SkillCheckGui:WaitForChild("Goal")
+_G.AutoSkillCheck = true          -- ← Включи/выключи здесь
+_G.AutoSkillCheckDelay = 0.03     -- Задержка (меньше = быстрее)
 
-local Sounds = {
-    Confirm = script:WaitForChild("Confirm"),
-    Great = script:WaitForChild("Great"),
-    Sound = script:WaitForChild("Sound")
-}
+local inSkillCheck = false
+local currentId = nil
+local currentPart = nil
 
-_G.AutoSkillCheck = _G.AutoSkillCheck or true   -- ← Включи/выключи авто здесь
-_G.AutoDelay = 0.05  -- задержка перед автокликом (чем меньше — тем быстрее)
-
-local isInSkillCheck = false
-local isScourgeMode = false
-local currentTarget = nil
-local connections = {}
-
-local function autoCompleteSkillCheck()
-    if not _G.AutoSkillCheck or not isInSkillCheck then return end
+local function perfectSkillCheck()
+    if not _G.AutoSkillCheck or not inSkillCheck then return end
     
-    task.wait(_G.AutoDelay)
+    task.wait(_G.AutoSkillCheckDelay)
     
-    local rotation = Line.Rotation
-    local goalRot = Goal.Rotation
+    -- Всегда попадаем в идеальную зону (Great)
+    SkillCheckResult:FireServer("success", 1, currentId, currentPart)
     
-    local zone1 = 102 + goalRot
-    local zone2 = 116 + goalRot
-    local zone3 = 159 + goalRot
-    
-    if zone1 <= rotation and rotation <= zone2 then
-        SkillCheckResultEvent:FireServer("success", 1, currentTarget, nil)
-        Sounds.Great:Play()
-    elseif zone2 < rotation and rotation <= zone3 then
-        SkillCheckResultEvent:FireServer("neutral", 0, currentTarget, nil)
-        Sounds.Confirm:Play()
-    else
-        SkillCheckResultEvent:FireServer("fail", -10, currentTarget, nil)
+    -- Опционально: звук Great
+    local greatSound = player.PlayerGui:FindFirstChild("SkillCheckPromptGui", true)
+    if greatSound then
+        local sound = greatSound:FindFirstChild("Great") or greatSound:FindFirstChildOfClass("Sound")
+        if sound then sound:Play() end
     end
 end
 
--- Основной обработчик обычного skill check
-SkillCheckEvent.OnClientEvent:Connect(function(generatorId, part)
-    currentTarget = generatorId
-    isInSkillCheck = true
-    isScourgeMode = false
+-- Обычный Skill Check
+SkillCheckEvent.OnClientEvent:Connect(function(id, part)
+    if not _G.AutoSkillCheck then return end
     
-    SkillCheckGui.Visible = true
-    Line.Rotation = 0
-    Goal.Rotation = math.random(0, 200)
-    Sounds.Sound:Play()
+    currentId = id
+    currentPart = part
+    inSkillCheck = true
     
-    -- Авто-клик
-    task.delay(0.5, function()
-        if isInSkillCheck and _G.AutoSkillCheck then
-            autoCompleteSkillCheck()
-        end
-    end)
+    -- Автоматически делаем идеально
+    perfectSkillCheck()
 end)
 
--- King Scourge Mode
-KingScourgeStart.OnClientEvent:Connect(function(p66, p67, count)
-    isScourgeMode = true
-    isInSkillCheck = true
-    currentTarget = p66
+-- King Scourge (много skill check'ов подряд)
+KingStart.OnClientEvent:Connect(function(id, part, count)
+    if not _G.AutoSkillCheck then return end
     
-    SkillCheckGui.Visible = true
-    Line.Rotation = 0
-    Goal.Rotation = math.random(0, 200)
-    Sounds.Sound:Play()
+    currentId = id
+    currentPart = part
+    inSkillCheck = true
     
-    task.delay(0.5, function()
-        if isInSkillCheck and _G.AutoSkillCheck then
-            autoCompleteSkillCheck()
-        end
-    end)
+    perfectSkillCheck()
 end)
 
-KingScourgeEnd.OnClientEvent:Connect(function()
-    isScourgeMode = false
-    isInSkillCheck = false
-    SkillCheckGui.Visible = false
+KingEnd.OnClientEvent:Connect(function()
+    inSkillCheck = false
 end)
 
--- Очистка при смерти/выходе
+-- Очистка
 player.CharacterRemoving:Connect(function()
-    isInSkillCheck = false
-    isScourgeMode = false
-    SkillCheckGui.Visible = false
+    inSkillCheck = false
 end)
 
-print("✅ Auto Skill Check загружен! (Auto = " .. tostring(_G.AutoSkillCheck) .. ")")
-print("Напиши _G.AutoSkillCheck = false чтобы выключить")
+print("🚀 Auto Skill Check загружен!")
+print("   Идеальное попадание | Auto =", _G.AutoSkillCheck)
+print("   Напиши: _G.AutoSkillCheck = false  — чтобы выключить")
+print("   Напиши: _G.AutoSkillCheck = true   — чтобы включить")
