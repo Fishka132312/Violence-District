@@ -12,6 +12,7 @@ local scripts = {
 	'Visual/HooksEsp.lua',
 	'Survivors/BypassGates.lua',
 	'Survivors/SelfHeal.lua',
+	'Survivors/SurvivorSpeed.lua',
 	'Whitelist.lua',
 }
 
