@@ -8,6 +8,7 @@ local scripts = {
 	'Killer/KillerSpeed.lua',
 	'Visual/PlayersEsp.lua',
 	'Visual/GeneratorEsp.lua',
+	'Visual/HooksEsp.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
@@ -84,6 +85,14 @@ Tab:AddToggle({
 	Default = false,
 	Callback = function(Value)
 		_G.EspGenerators = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Esp Hooks",
+	Default = false,
+	Callback = function(Value)
+		_G.HooksEsp = Value
 	end    
 })
 
