@@ -114,81 +114,48 @@ local Tab = Window:MakeTab({
 	PremiumOnly = false
 })
 
-local Section = Tab:AddSection({
-    Name = "Whitelist Manager"
+local PlayerDropdown = Tab:AddDropdown({
+    Name = "Choose Player",
+    Default = "",
+    Options = {},
+    Callback = function(Value)
+        _G.SelectedPlayer = Value
+        print("Выбран: " .. Value)
+    end
 })
 
-if _G.WhitelistDropdownCreated then
-    print("Whitelist Manager уже создан")
-else
-    _G.WhitelistDropdownCreated = true
-
-    local PlayerDropdown = Tab:AddDropdown({
-        Name = "Choose Player",
-        Default = "",
-        Options = {},
-        Callback = function(Value)
-            _G.SelectedPlayer = Value
-            print("Выбран: " .. Value)
+Tab:AddButton({
+    Name = "Add / Remove to WhiteList",
+    Callback = function()
+        local selected = _G.SelectedPlayer
+        
+        if not selected or selected == "" then
+            print("❌ Сначала выбери игрока")
+            return
         end
-    })
 
-    Tab:AddButton({
-        Name = "Add / Remove Whitelist",
-        Callback = function()
-            local selected = _G.SelectedPlayer
-            if not selected or selected == "" then
-                print("❌ Выбери игрока")
-                return
-            end
-         
-            local index = table.find(_G.Whitelist, selected)
-            if index then
-                table.remove(_G.Whitelist, index)
-                print("➖ " .. selected .. " удалён")
-            else
-                table.insert(_G.Whitelist, selected)
-                print("✅ " .. selected .. " добавлен")
-            end
+        if table.find(_G.Whitelist, selected) then
+            print("⚠️ " .. selected .. " уже в whitelist")
+        else
+            table.insert(_G.Whitelist, selected)
+            print("✅ " .. selected .. " добавлен в whitelist")
         end
-    })
+    end
+})
 
-    Tab:AddButton({
-        Name = "Показать Whitelist",
-        Callback = function()
-            if #_G.Whitelist == 0 then
-                print("Whitelist пуст")
-                return
-            end
-            print("=== WHITELIST ===")
-            for _, name in ipairs(_G.Whitelist) do
-                print(" - " .. name)
-            end
+Tab:AddButton({
+    Name = "🔄 Refresh list",
+    Callback = function()
+        local options = _G.PlayerList or {}
+        if #options == 0 then
+            options = {"Нет игроков"}
+        else
+            table.sort(options)
         end
-    })
-
-    Tab:AddButton({
-        Name = "🔄 Обновить список игроков",
-        Callback = function()
-            local options = _G.PlayerList or {}
-            if #options == 0 then
-                options = {"Нет игроков"}
-            else
-                local unique = {}
-                for _, v in ipairs(options) do
-                    unique[v] = true
-                end
-                options = {}
-                for name in pairs(unique) do
-                    table.insert(options, name)
-                end
-                table.sort(options)
-            end
-            PlayerDropdown:Refresh(options)
-            print("Список обновлён (" .. #options .. " игроков)")
-        end
-    })
-end
+        PlayerDropdown:Refresh(options)
+        print("Список обновлён")
+    end
+})
 
 Tab:AddToggle({
 	Name = "Auto Attack",
