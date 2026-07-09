@@ -1,25 +1,35 @@
-_G.WhitelistSystem = _G.WhitelistSystem or {}
-_G.WhitelistSystem.List = _G.WhitelistSystem.List or {}
+-- === PLAYER LIST UPDATER (отдельный LocalScript) ===
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
-function _G.WhitelistSystem.Add(player)
-	if player and player:IsA("Player") then
-		_G.WhitelistSystem.List[player.UserId] = true
-		print("[WL]", player.Name, "добавлен в вайтлист.")
-	end
+_G.PlayerList = _G.PlayerList or {}
+_G.Whitelist = _G.Whitelist or {}
+_G.SelectedPlayer = _G.SelectedPlayer or nil
+
+local lastUpdate = 0
+
+local function updatePlayerList()
+    local list = {}
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= Players.LocalPlayer then
+            table.insert(list, plr.Name)
+        end
+    end
+    table.sort(list)
+    _G.PlayerList = list
+    print("[PlayerUpdater] Список обновлён: " .. #list .. " игроков")
 end
 
-function _G.WhitelistSystem.Remove(player)
-	if player and player:IsA("Player") then
-		_G.WhitelistSystem.List[player.UserId] = nil
-		print("[WL]", player.Name, "удален из вайтлиста.")
-	end
-end
+updatePlayerList()
 
-function _G.WhitelistSystem.IsWhitelisted(player)
-	if not player or not player:IsA("Player") then return false end
-	return _G.WhitelistSystem.List[player.UserId] == true
-end
-
-game:GetService("Players").PlayerRemoving:Connect(function(player)
-	_G.WhitelistSystem.List[player.UserId] = nil
+RunService.Heartbeat:Connect(function()
+    if tick() - lastUpdate >= 5 then
+        updatePlayerList()
+        lastUpdate = tick()
+    end
 end)
+
+Players.PlayerAdded:Connect(updatePlayerList)
+Players.PlayerRemoving:Connect(updatePlayerList)
+
+print("=== Player List Updater запущен ===")
