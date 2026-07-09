@@ -1,6 +1,7 @@
-if _G.AutoAttackScriptRunning then ----da
-	_G.AutoAttackScriptRunning = false
-	task.wait(0.3)
+-- === AUTO ATTACK с Whitelist (не бьёт своих) ===
+if _G.AutoAttackScriptRunning then
+    _G.AutoAttackScriptRunning = false
+    task.wait(0.3)
 end
 
 _G.AutoAttackScriptRunning = true
@@ -19,60 +20,67 @@ local AttackRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Att
 local args = { false }
 
 local function isCarryingSomething(character)
-	if not character then return false end
-	
-	local carryingAttribute = character:GetAttribute("IsCarrying")
-	
-	if carryingAttribute == true then
-		return true
-	end
+    if not character then return false end
+    return character:GetAttribute("IsCarrying") == true
+end
 
-	return false
+local function isInWhitelist(playerName)
+    if not _G.Whitelist then return false end
+    return table.find(_G.Whitelist, playerName) ~= nil
 end
 
 local function getClosestPlayer()
-	local closestPlayer = nil
-	local shortestDistance = MAX_DISTANCE
+    local closestPlayer = nil
+    local shortestDistance = MAX_DISTANCE
+    local localCharacter = LocalPlayer.Character
+    if not localCharacter or not localCharacter:FindFirstChild("HumanoidRootPart") then
+        return nil
+    end
 
-	local localCharacter = LocalPlayer.Character
-	if not localCharacter or not localCharacter:FindFirstChild("HumanoidRootPart") then 
-		return nil 
-	end
-	
-	local localHRP = localCharacter.HumanoidRootPart
+    local localHRP = localCharacter.HumanoidRootPart
 
-	for _, player in ipairs(Players:GetPlayers()) do
-		if player ~= LocalPlayer then
-			local char = player.Character
-			local hrp = char and char:FindFirstChild("HumanoidRootPart")
-			local humanoid = char and char:FindFirstChild("Humanoid")
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            local char = player.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            local humanoid = char and char:FindFirstChild("Humanoid")
 
-			if hrp and humanoid and humanoid.Health > 0 then
-				local distance = (localHRP.Position - hrp.Position).Magnitude
-				if distance < shortestDistance then
-					shortestDistance = distance
-					closestPlayer = player
-				end
-			end
-		end
-	end
+            if hrp and humanoid and humanoid.Health > 0 then
+                -- Проверяем whitelist
+                if isInWhitelist(player.Name) then
+                    continue  -- Пропускаем игрока из вайтлиста
+                end
 
-	return closestPlayer
+                local distance = (localHRP.Position - hrp.Position).Magnitude
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    closestPlayer = player
+                end
+            end
+        end
+    end
+    return closestPlayer
 end
 
 task.spawn(function()
-	while _G.AutoAttackScriptRunning and _G.CurrentAutoAttackId == currentScriptId do
-		local onCorrectTeam = LocalPlayer.Team and LocalPlayer.Team.Name == TARGET_TEAM_NAME
-		local carrying = isCarryingSomething(LocalPlayer.Character)
+    while _G.AutoAttackScriptRunning and _G.CurrentAutoAttackId == currentScriptId do
+        local onCorrectTeam = LocalPlayer.Team and LocalPlayer.Team.Name == TARGET_TEAM_NAME
+        local carrying = isCarryingSomething(LocalPlayer.Character)
 
-		if _G.AutoAttackKiller == true and onCorrectTeam and not carrying then
-			local target = getClosestPlayer()
-			if target then
-				AttackRemote:FireServer(unpack(args))
-			end
-			task.wait(ATTACK_COOLDOWN)
-		else
-			task.wait(0.1)
-		end
-	end
+        if _G.AutoAttackKiller == true and onCorrectTeam and not carrying then
+            local target = getClosestPlayer()
+            
+            if target then
+                -- Атака только если цель НЕ в whitelist (уже проверено выше)
+                AttackRemote:FireServer(unpack(args))
+                print("AutoAttack → " .. target.Name)
+            end
+            
+            task.wait(ATTACK_COOLDOWN)
+        else
+            task.wait(0.1)
+        end
+    end
 end)
+
+print("AutoAttack с whitelist загружен")
