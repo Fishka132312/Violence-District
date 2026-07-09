@@ -1,12 +1,17 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
+local OrionLib = _G.OrionLib or getgenv().OrionLib
+
 local InfoEvent = Instance.new("BindableEvent")
 InfoEvent.Name = "PlayerInfoRequestEvent"
 
 InfoEvent.Event:Connect(function(targetName)
     local target = Players:FindFirstChild(targetName)
-    if not target then return end
+    if not target then 
+        warn("Target not found:", targetName)
+        return 
+    end
 
     local info = {
         AllowKiller = target:GetAttribute("AllowKiller") or false,
@@ -19,7 +24,7 @@ InfoEvent.Event:Connect(function(targetName)
     }
 
     local message = string.format(
-        "👤 Игрок: %s\n\n"..
+        "👤 Player: %s\n\n"..
         "AllowKiller: %s\n"..
         "EXP: %d | Level: %d\n"..
         "Platform: %s\n"..
@@ -41,16 +46,26 @@ InfoEvent.Event:Connect(function(targetName)
             Time = 8
         })
     else
-        warn("OrionLib не найден!")
+        print("[PlayerInfo] Notification:\n" .. message)
     end
 end)
 
 LocalPlayer:GetAttributeChangedSignal("RequestPlayerInfo"):Connect(function()
     local targetName = LocalPlayer:GetAttribute("RequestPlayerInfo")
+    
+    print("[DEBUG] Attribute changed! Value =", targetName)
+    
     if targetName and targetName ~= "" then
-        InfoEvent:Fire(targetName)
+        task.spawn(function()
+            InfoEvent:Fire(targetName)
+        end)
     end
-    LocalPlayer:SetAttribute("RequestPlayerInfo", nil)
+    
+    task.delay(0.1, function()
+        if LocalPlayer:GetAttribute("RequestPlayerInfo") == targetName then
+            LocalPlayer:SetAttribute("RequestPlayerInfo", nil)
+        end
+    end)
 end)
 
-print("Обработчик информации о игроках запущен")
+print("Обработчик информации о игроках запущен ✅")
