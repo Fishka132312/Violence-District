@@ -13,6 +13,7 @@ local scripts = {
 	'Visual/PlayersEsp.lua',
 	'Visual/GeneratorEsp.lua',
 	'Visual/HooksEsp.lua',
+	'Visual/WindowsPalletsEsp.lua',
 	'Survivors/BypassGates.lua',
 	'Survivors/SelfHeal.lua',
 	'Survivors/SurvivorSpeed.lua',
@@ -189,6 +190,14 @@ Tab:AddToggle({
 	Default = false,
 	Callback = function(Value)
 		_G.HooksEsp = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Esp Windows/Pallets",
+	Default = false,
+	Callback = function(Value)
+		_G.WinPaletEsp = Value
 	end    
 })
 
