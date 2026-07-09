@@ -120,8 +120,8 @@ local Section = Tab:AddSection({
 
 local PlayerDropdown = Tab:AddDropdown({
     Name = "Choose Player",
-    Default = "Загрузка игроков...",
-    Options = _G.PlayerList or {"Загрузка..."},
+    Default = nil,
+    Options = {"Загрузка игроков..."},
     Callback = function(Value)
         _G.SelectedPlayer = Value
         print("Choosed: " .. Value)
@@ -132,13 +132,14 @@ Tab:AddButton({
     Name = "Add / Remove Whitelist",
     Callback = function()
         local selected = _G.SelectedPlayer
-       
+      
         if not selected or selected == "Загрузка игроков..." or selected == "Нет игроков" then
             print("❌ Choose Player")
             return
         end
+        
         local index = table.find(_G.Whitelist, selected)
-       
+      
         if index then
             table.remove(_G.Whitelist, index)
             print("➖ " .. selected .. " removed from whitelist")
@@ -149,29 +150,44 @@ Tab:AddButton({
     end
 })
 
+local LastPlayerHash = ""
+
 task.spawn(function()
     while true do
-        task.wait(5)
-        if PlayerDropdown and typeof(PlayerDropdown.Refresh) == "function" then
-            local options = _G.PlayerList or {}
-            
-            if #options == 0 then
-                options = {"Нет игроков"}
-            else
-                local unique = {}
-                for _, name in ipairs(options) do
-                    unique[name] = true
-                end
-                
-                options = {}
-                for name in pairs(unique) do
-                    table.insert(options, name)
-                end
-                
-                table.sort(options)
+        task.wait(3)
+        
+        if not PlayerDropdown or typeof(PlayerDropdown.Refresh) ~= "function" then
+            continue
+        end
+
+        local options = _G.PlayerList or {}
+        
+        if #options == 0 then
+            options = {"Нет игроков"}
+        else
+            local unique = {}
+            for _, name in ipairs(options) do
+                unique[name] = true
             end
             
-            PlayerDropdown:Refresh(options)
+            options = {}
+            for name in pairs(unique) do
+                table.insert(options, name)
+            end
+            table.sort(options)
+        end
+
+        local currentHash = table.concat(options, ",")
+        if currentHash == LastPlayerHash then
+            continue
+        end
+        
+        LastPlayerHash = currentHash
+
+        PlayerDropdown:Refresh(options)
+
+        if _G.SelectedPlayer and table.find(options, _G.SelectedPlayer) then
+            PlayerDropdown:Set(_G.SelectedPlayer)
         end
     end
 end)
