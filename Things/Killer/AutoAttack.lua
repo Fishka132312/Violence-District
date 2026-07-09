@@ -1,4 +1,4 @@
-if _G.AutoAttackScriptRunning then
+if _G.AutoAttackScriptRunning then ----da
 	_G.AutoAttackScriptRunning = false
 	task.wait(0.3)
 end
@@ -18,17 +18,12 @@ local LocalPlayer = Players.LocalPlayer
 local AttackRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Attacks"):WaitForChild("BasicAttack")
 local args = { false }
 
--- Обновленная функция под кастомное Property модели персонажа
 local function isCarryingSomething(character)
 	if not character then return false end
 	
-	-- Безопасно проверяем существование свойства в модели (в Workspace)
-	local success, result = pcall(function() 
-		return character.IsCarrying 
-	end)
+	local carryingAttribute = character:GetAttribute("IsCarrying")
 	
-	-- Если свойство прочиталось и оно равно true, возвращаем true
-	if success and result == true then
+	if carryingAttribute == true then
 		return true
 	end
 
