@@ -41,9 +41,18 @@ local function removeESP(player)
     end
 end
 
+local rainbowColors = {
+    Color3.fromRGB(255, 0, 0),
+    Color3.fromRGB(255, 127, 0),
+    Color3.fromRGB(255, 255, 0),
+    Color3.fromRGB(0, 255, 0),
+    Color3.fromRGB(0, 255, 255),
+    Color3.fromRGB(0, 0, 255),
+    Color3.fromRGB(139, 0, 255)
+}
+
 local function createESP(player, character)
     if player == LocalPlayer then return end
-
     local rootPart = character:FindFirstChild("HumanoidRootPart")
     if not rootPart then
         removeESP(player)
@@ -52,9 +61,7 @@ local function createESP(player, character)
 
     local isWhitelisted = isInWhitelist(player.Name)
 
-    -- ==================== WHITELIST ESP (НЕОБЫЧНЫЙ) ====================
     if isWhitelisted then
-        -- Убираем обычный Highlight
         if activeVisuals[player] and activeVisuals[player].Highlight then
             activeVisuals[player].Highlight:Destroy()
             activeVisuals[player].Highlight = nil
@@ -63,45 +70,49 @@ local function createESP(player, character)
         local billboard = activeVisuals[player] and activeVisuals[player].Billboard
         if not billboard or billboard.Parent ~= rootPart then
             if billboard then billboard:Destroy() end
-
             billboard = Instance.new("BillboardGui")
             billboard.Name = "WhitelistBillboard"
             billboard.AlwaysOnTop = true
-            billboard.Size = UDim2.new(0, 250, 0, 80)           -- больше размер
+            billboard.Size = UDim2.new(0, 250, 0, 70)
             billboard.StudsOffset = Vector3.new(0, 4, 0)
 
             local label = Instance.new("TextLabel")
             label.Name = "ESPLabel"
             label.Size = UDim2.new(1, 0, 1, 0)
             label.BackgroundTransparency = 1
-            label.TextSize = 18
-            label.Font = Enum.Font.Arcade          -- необычный шрифт
+            label.TextSize = 19
+            label.Font = Enum.Font.Arcade
             label.TextStrokeTransparency = 0
             label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
             label.Parent = billboard
 
             billboard.Parent = rootPart
-
             if not activeVisuals[player] then activeVisuals[player] = {} end
             activeVisuals[player].Billboard = billboard
         end
 
         local label = billboard:FindFirstChild("ESPLabel")
         if label then
-            local localRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-            local distance = localRoot and math.floor((localRoot.Position - rootPart.Position).Magnitude) or 0
-
-            label.Text = string.format("★ %s ★\n[WHITELIST]\n%d Studs", player.Name:upper(), distance)
-            label.TextColor3 = Color3.fromRGB(0, 255, 255)   -- ярко-голубой
+            label.Text = "★ " .. player.Name:upper() .. " ★\n[WHITELIST]"
         end
+
+        -- Rainbow effect
+        local colorIndex = 1
+        task.spawn(function()
+            while billboard and billboard.Parent do
+                if label then
+                    label.TextColor3 = rainbowColors[colorIndex]
+                    colorIndex = (colorIndex % #rainbowColors) + 1
+                end
+                task.wait(0.15)
+            end
+        end)
         return
     end
 
-    -- ==================== ОБЫЧНЫЙ ESP ====================
     local team = player.Team
     local teamName = team and team.Name or "NoTeam"
     local isEnabled = isEspEnabledForTeam(teamName)
-
     if not isEnabled then
         removeESP(player)
         return
@@ -119,7 +130,6 @@ local function createESP(player, character)
         activeVisuals[player] = {}
     end
 
-    -- Highlight
     local highlight = activeVisuals[player].Highlight
     if not highlight or highlight.Parent ~= character then
         if highlight then highlight:Destroy() end
@@ -134,7 +144,6 @@ local function createESP(player, character)
     highlight.FillColor = teamColor
     highlight.OutlineColor = teamColor
 
-    -- Billboard
     local billboard = activeVisuals[player].Billboard
     if not billboard or billboard.Parent ~= rootPart then
         if billboard then billboard:Destroy() end
@@ -187,4 +196,4 @@ local function cleanup()
 end
 
 _G[SCRIPT_TAG] = cleanup
-print("[ESP + КРАСИВЫЙ WHITELIST] Загружен!")
+print("[ESP + Rainbow Whitelist] Загружен!")
