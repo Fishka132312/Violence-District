@@ -1,4 +1,4 @@
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---вфвыфвф
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---йййй
 local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = false, SaveConfig = true, ConfigFolder = "Violence District meowl"})
 
 local scripts = {
@@ -140,14 +140,13 @@ Tab:AddButton({
     Name = "Add / Remove Whitelist",
     Callback = function()
         local selected = _G.SelectedPlayer
-        
+       
         if not selected or selected == "Загрузка игроков..." or selected == "Нет игроков" then
             print("❌ Choose Player")
             return
         end
-
         local index = table.find(_G.Whitelist, selected)
-        
+       
         if index then
             table.remove(_G.Whitelist, index)
             print("➖ " .. selected .. " removed from whitelist")
@@ -159,12 +158,27 @@ Tab:AddButton({
 })
 
 task.spawn(function()
-    while task.wait(5) do
+    while true do
+        task.wait(5)
         if PlayerDropdown and typeof(PlayerDropdown.Refresh) == "function" then
             local options = _G.PlayerList or {}
+            
             if #options == 0 then
                 options = {"Нет игроков"}
+            else
+                local unique = {}
+                for _, name in ipairs(options) do
+                    unique[name] = true
+                end
+                
+                options = {}
+                for name in pairs(unique) do
+                    table.insert(options, name)
+                end
+                
+                table.sort(options)
             end
+            
             PlayerDropdown:Refresh(options)
         end
     end
