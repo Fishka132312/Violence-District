@@ -1,15 +1,13 @@
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
-local OrionLib = _G.OrionLib or getgenv().OrionLib
-
 local InfoEvent = Instance.new("BindableEvent")
 InfoEvent.Name = "PlayerInfoRequestEvent"
 
 InfoEvent.Event:Connect(function(targetName)
     local target = Players:FindFirstChild(targetName)
     if not target then 
-        warn("Target not found:", targetName)
+        warn("[PlayerInfo] Игрок не найден: " .. targetName)
         return 
     end
 
@@ -24,12 +22,14 @@ InfoEvent.Event:Connect(function(targetName)
     }
 
     local message = string.format(
-        "👤 Player: %s\n\n"..
+        "\n=== Информация об игроке ===\n"..
+        "👤 Игрок: %s\n\n"..
         "AllowKiller: %s\n"..
         "EXP: %d | Level: %d\n"..
         "Platform: %s\n"..
         "Screws: %d | Gears: %d\n"..
-        "SelectedKiller: %s",
+        "SelectedKiller: %s\n"..
+        "==========================",
         target.Name,
         tostring(info.AllowKiller),
         info.EXP, info.Level,
@@ -38,34 +38,20 @@ InfoEvent.Event:Connect(function(targetName)
         info.SelectedKiller
     )
 
-    if OrionLib then
-        OrionLib:MakeNotification({
-            Name = "Информация об игроке",
-            Content = message,
-            Image = "rbxassetid://4483345998",
-            Time = 8
-        })
-    else
-        print("[PlayerInfo] Notification:\n" .. message)
-    end
+    print(message)
 end)
 
 LocalPlayer:GetAttributeChangedSignal("RequestPlayerInfo"):Connect(function()
     local targetName = LocalPlayer:GetAttribute("RequestPlayerInfo")
     
-    print("[DEBUG] Attribute changed! Value =", targetName)
-    
     if targetName and targetName ~= "" then
-        task.spawn(function()
-            InfoEvent:Fire(targetName)
-        end)
+        print("[DEBUG] Получен запрос на игрока: " .. targetName)
+        InfoEvent:Fire(targetName)
     end
     
-    task.delay(0.1, function()
-        if LocalPlayer:GetAttribute("RequestPlayerInfo") == targetName then
-            LocalPlayer:SetAttribute("RequestPlayerInfo", nil)
-        end
+    task.delay(0.15, function()
+        LocalPlayer:SetAttribute("RequestPlayerInfo", nil)
     end)
 end)
 
-print("Обработчик информации о игроках запущен ✅")
+print("✅ Обработчик информации о игроках запущен (вывод в F9)")
