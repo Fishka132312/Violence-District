@@ -1,17 +1,12 @@
-local Players = game:GetService("Players") --66534535
+local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
+local InfoEvent = Instance.new("BindableEvent")
+InfoEvent.Name = "PlayerInfoRequestEvent"
 
-LocalPlayer:GetAttributeChangedSignal("RequestPlayerInfo"):Connect(function()
-    local targetName = LocalPlayer:GetAttribute("RequestPlayerInfo")
-    if not targetName then return end
-    
+InfoEvent.Event:Connect(function(targetName)
     local target = Players:FindFirstChild(targetName)
-    if not target then
-        LocalPlayer:SetAttribute("RequestPlayerInfo", nil)
-        return
-    end
+    if not target then return end
 
     local info = {
         AllowKiller = target:GetAttribute("AllowKiller") or false,
@@ -24,7 +19,7 @@ LocalPlayer:GetAttributeChangedSignal("RequestPlayerInfo"):Connect(function()
     }
 
     local message = string.format(
-        "👤 Player: %s\n\n"..
+        "👤 Игрок: %s\n\n"..
         "AllowKiller: %s\n"..
         "EXP: %d | Level: %d\n"..
         "Platform: %s\n"..
@@ -38,12 +33,24 @@ LocalPlayer:GetAttributeChangedSignal("RequestPlayerInfo"):Connect(function()
         info.SelectedKiller
     )
 
-    OrionLib:MakeNotification({
-        Name = "Информация об игроке",
-        Content = message,
-        Image = "rbxassetid://4483345998",
-        Time = 8
-    })
+    if OrionLib then
+        OrionLib:MakeNotification({
+            Name = "Информация об игроке",
+            Content = message,
+            Image = "rbxassetid://4483345998",
+            Time = 8
+        })
+    else
+        warn("OrionLib не найден!")
+    end
+end)
 
+LocalPlayer:GetAttributeChangedSignal("RequestPlayerInfo"):Connect(function()
+    local targetName = LocalPlayer:GetAttribute("RequestPlayerInfo")
+    if targetName and targetName ~= "" then
+        InfoEvent:Fire(targetName)
+    end
     LocalPlayer:SetAttribute("RequestPlayerInfo", nil)
 end)
+
+print("Обработчик информации о игроках запущен")
