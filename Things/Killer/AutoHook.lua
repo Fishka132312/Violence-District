@@ -5,7 +5,7 @@ local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 local CarryEvent = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Carry"):WaitForChild("CarrySurvivorEvent")
 
-_G.AutoHook = false
+_G.AutoCarry = false
 
 local function getClosestPlayer()
 	local closestPlayer = nil
@@ -32,13 +32,13 @@ local function getClosestPlayer()
 	return closestPlayer
 end
 
-if _G.AutoHookConnection then
-	_G.AutoHookConnection:Disconnect()
-	_G.AutoHookConnection = nil
+if _G.AutoCarryConnection then
+	_G.AutoCarryConnection:Disconnect()
+	_G.AutoCarryConnection = nil
 end
 
-_G.AutoHookConnection = RunService.Heartbeat:Connect(function()
-	if not _G.AutoHook then return end
+_G.AutoCarryConnection = RunService.Heartbeat:Connect(function()
+	if not _G.AutoCarry then return end
 
 	local targetPlayer = getClosestPlayer()
 	if targetPlayer and targetPlayer.Character then
