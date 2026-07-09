@@ -1,16 +1,40 @@
-local ReplicatedStorage = game:GetService("ReplicatedStorage") --5434234234
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 
 local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-
-local emotesFolder = ReplicatedStorage:WaitForChild("Emotes")
-
 local currentTrack = nil
 local currentEmoteName = nil
 
+local humanoid = nil
+
+-- Функция обновления humanoid при респавне
+local function updateHumanoid(newCharacter)
+    if currentTrack then
+        currentTrack:Stop()
+        currentTrack = nil
+    end
+    
+    humanoid = newCharacter:WaitForChild("Humanoid")
+    
+    print("✅ Humanoid updated for new character")
+end
+
+-- Инициализация
+if player.Character then
+    updateHumanoid(player.Character)
+end
+
+player.CharacterAdded:Connect(updateHumanoid)
+
+local emotesFolder = ReplicatedStorage:WaitForChild("Emotes")
+
 local function playEmote(emoteName)
+    if not humanoid then
+        warn("Humanoid not found!")
+        return false
+    end
+
+    -- Останавливаем предыдущую анимацию
     if currentTrack then
         currentTrack:Stop()
         currentTrack = nil
@@ -23,7 +47,6 @@ local function playEmote(emoteName)
     end
 
     local animId = emoteFolder:GetAttribute("animationid")
-    
     if not animId then
         warn("Attribute 'animationid' not found in emote:", emoteName)
         return false
@@ -38,6 +61,7 @@ local function playEmote(emoteName)
 
     currentEmoteName = emoteName
     print("✅ Playing emote:", emoteName, "| ID:", animId)
+
     return true
 end
 
@@ -50,6 +74,7 @@ local function stopEmote()
     end
 end
 
+-- Глобальные функции
 getgenv().PlayEmoteByName = playEmote
 getgenv().StopCurrentEmote = stopEmote
 getgenv().GetAllEmotes = function()
@@ -62,3 +87,11 @@ getgenv().GetAllEmotes = function()
     table.sort(list)
     return list
 end
+
+-- Дополнительно: останавливаем анимацию при смерти
+player.CharacterRemoving:Connect(function()
+    if currentTrack then
+        currentTrack:Stop()
+        currentTrack = nil
+    end
+end)
