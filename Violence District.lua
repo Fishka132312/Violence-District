@@ -1,5 +1,5 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
-local Window = OrionLib:MakeWindow({Name = "+1Keyboard", HidePremium = false, SaveConfig = true, ConfigFolder = "+1Keyboard"})
+local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = false, SaveConfig = true, ConfigFolder = "Violence District meowl"})
 
 local scripts = {
     'Emotes.lua',
@@ -7,26 +7,35 @@ local scripts = {
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
 
-task.spawn(function()
-    for i, scriptName in ipairs(scripts) do
-        local fullUrl = baseUrl .. scriptName
-        
-        local success, err = pcall(function()
-            local code = game:HttpGet(fullUrl)
-            if code then
-                loadstring(code)()
-            else
-                warn("Не удалось получить код для: " .. scriptName)
-            end
-        end)
-        
-        if not success then
-            warn("Ошибка при загрузке " .. scriptName .. ": " .. tostring(err))
+-- Инициализируем переменные заранее, чтобы Orion Lib не выдавал ошибку, если загрузка задержится
+_G.EmoteList = _G.EmoteList or {}
+_G.SelectedEmote = _G.SelectedEmote or nil
+_G.EmoteLoopActive = _G.EmoteLoopActive or false
+
+-- Загружаем скрипты СИНХРОННО (без task.spawn), чтобы дождаться заполнения _G.EmoteList
+for i, scriptName in ipairs(scripts) do
+    local fullUrl = baseUrl .. scriptName
+    
+    local success, err = pcall(function()
+        local code = game:HttpGet(fullUrl)
+        if code then
+            loadstring(code)()
+        else
+            warn("Не удалось получить код для: " .. scriptName)
         end
-        
-        task.wait(0.7) 
+    end)
+    
+    if not success then
+        warn("Ошибка при загрузке " .. scriptName .. ": " .. tostring(err))
     end
-end)
+    
+    task.wait(0.5) -- Небольшая задержка между скриптами, если их будет больше
+end
+
+-- Защита от краша Orion Lib: если папка пустая или скрипт не скачался, делаем дефолтный список
+if #_G.EmoteList == 0 then
+    _G.EmoteList = {"Эмоции не найдены"}
+end
 
 -------------------------Emotes---------------------------
 
@@ -36,17 +45,20 @@ local Tab = Window:MakeTab({
 	PremiumOnly = false
 })
 
+-- Дропдаун
 Tab:AddDropdown({
 	Name = "Выбрать Эмоцию",
-	Default = _G.EmoteList[1] or "Нет эмоций", -- Ставим первую по дефолту, если папка не пуста
-	Options = _G.EmoteList, -- Передаем массив, который собрал первый скрипт
+	Default = _G.EmoteList[1], 
+	Options = _G.EmoteList, 
 	Callback = function(Value)
-		_G.SelectedEmote = Value
-		print("Выбрана эмоция: " .. tostring(_G.SelectedEmote))
+		if Value ~= "Эмоции не найдены" then
+			_G.SelectedEmote = Value
+			print("Выбрана эмоция: " .. tostring(_G.SelectedEmote))
+		end
 	end    
 })
 
--- Чекбокс (Toggle) для старта/остановки
+-- Чекбокс (Toggle)
 Tab:AddToggle({
 	Name = "Воспроизводить эмоцию",
 	Default = false,
