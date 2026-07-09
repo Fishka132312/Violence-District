@@ -17,6 +17,7 @@ local scripts = {
 	'Survivors/SelfHeal.lua',
 	'Survivors/SurvivorSpeed.lua',
 	'Survivors/AutoSkillCheck.lua',
+	'Survivors/DisCollision.lua',
 	'Whitelist.lua',
 	'Main/ShowPlayerInfo.lua',
 	'Main/Fullbright.lua',
@@ -224,6 +225,14 @@ Tab:AddToggle({
 	Default = false,
 	Callback = function(Value)
 		_G.AutoSkillCheck = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Disable Collision",
+	Default = false,
+	Callback = function(Value)
+		_G.DisableCollision = Value
 	end    
 })
 
