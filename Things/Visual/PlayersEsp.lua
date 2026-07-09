@@ -15,13 +15,11 @@ local TEAM_COLORS = {
     ["Default"] = Color3.fromRGB(255, 255, 255)
 }
 
--- Настройки ESP
 if _G.EspKiller == nil then _G.EspKiller = false end
 if _G.EspSurvivors == nil then _G.EspSurvivors = false end
 if _G.EspSpectator == nil then _G.EspSpectator = false end
 
 local activeVisuals = {}
-local lastLoggedState = {}
 
 local function isInWhitelist(playerName)
     if not _G.Whitelist then return false end
@@ -46,25 +44,22 @@ end
 local function createESP(player, character)
     if player == LocalPlayer then return end
 
-    local team = player.Team
-    local teamName = team and team.Name or "NoTeam"
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then
+        removeESP(player)
+        return
+    end
+
     local isWhitelisted = isInWhitelist(player.Name)
 
-    -- === WHITELIST ОБРАБОТКА ===
+    -- ==================== WHITELIST ESP (НЕОБЫЧНЫЙ) ====================
     if isWhitelisted then
-        local rootPart = character:FindFirstChild("HumanoidRootPart")
-        if not rootPart then
-            removeESP(player)
-            return
-        end
-
-        -- Удаляем Highlight (чтобы не обводить)
+        -- Убираем обычный Highlight
         if activeVisuals[player] and activeVisuals[player].Highlight then
             activeVisuals[player].Highlight:Destroy()
             activeVisuals[player].Highlight = nil
         end
 
-        -- Создаём/обновляем только текст
         local billboard = activeVisuals[player] and activeVisuals[player].Billboard
         if not billboard or billboard.Parent ~= rootPart then
             if billboard then billboard:Destroy() end
@@ -72,20 +67,21 @@ local function createESP(player, character)
             billboard = Instance.new("BillboardGui")
             billboard.Name = "WhitelistBillboard"
             billboard.AlwaysOnTop = true
-            billboard.Size = UDim2.new(0, 200, 0, 50)
-            billboard.StudsOffset = Vector3.new(0, 3.5, 0)
+            billboard.Size = UDim2.new(0, 250, 0, 80)           -- больше размер
+            billboard.StudsOffset = Vector3.new(0, 4, 0)
 
             local label = Instance.new("TextLabel")
             label.Name = "ESPLabel"
             label.Size = UDim2.new(1, 0, 1, 0)
             label.BackgroundTransparency = 1
-            label.TextSize = 16
-            label.Font = Enum.Font.SourceSansBold
+            label.TextSize = 18
+            label.Font = Enum.Font.Arcade          -- необычный шрифт
             label.TextStrokeTransparency = 0
             label.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
             label.Parent = billboard
 
             billboard.Parent = rootPart
+
             if not activeVisuals[player] then activeVisuals[player] = {} end
             activeVisuals[player].Billboard = billboard
         end
@@ -95,23 +91,24 @@ local function createESP(player, character)
             local localRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
             local distance = localRoot and math.floor((localRoot.Position - rootPart.Position).Magnitude) or 0
 
-            label.Text = string.format("%s\n[WHITELIST] [%d]", player.Name, distance)
-            label.TextColor3 = Color3.fromRGB(0, 255, 255)  -- Ярко-голубой цвет
+            label.Text = string.format("★ %s ★\n[WHITELIST]\n%d Studs", player.Name:upper(), distance)
+            label.TextColor3 = Color3.fromRGB(0, 255, 255)   -- ярко-голубой
         end
         return
     end
 
-    -- === ОБЫЧНЫЙ ESP (для не вайтлистовых) ===
+    -- ==================== ОБЫЧНЫЙ ESP ====================
+    local team = player.Team
+    local teamName = team and team.Name or "NoTeam"
     local isEnabled = isEspEnabledForTeam(teamName)
+
     if not isEnabled then
         removeESP(player)
         return
     end
 
-    local rootPart = character:FindFirstChild("HumanoidRootPart")
     local humanoid = character:FindFirstChildOfClass("Humanoid")
-
-    if not rootPart or not humanoid or humanoid.Health <= 0 then
+    if not humanoid or humanoid.Health <= 0 then
         removeESP(player)
         return
     end
@@ -190,4 +187,4 @@ local function cleanup()
 end
 
 _G[SCRIPT_TAG] = cleanup
-print("[ESP + WHITELIST] Загружен успешно!")
+print("[ESP + КРАСИВЫЙ WHITELIST] Загружен!")
