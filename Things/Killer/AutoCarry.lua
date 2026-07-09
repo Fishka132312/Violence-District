@@ -46,6 +46,11 @@ _G.AutoCarryConnection = RunService.Heartbeat:Connect(function()
 		return 
 	end
 
+	local character = LocalPlayer.Character
+	if character and character:GetAttribute("IsCarrying") == true then
+		return
+	end
+
 	local targetPlayer = getClosestPlayer()
 	if targetPlayer and targetPlayer.Character then
 		local args = {
