@@ -51,7 +51,7 @@ local Tab = Window:MakeTab({
 })
 
 local Section = Tab:AddSection({
-	Name = "Show Player Info"
+    Name = "Show Player Info"
 })
 
 local selectedPlayerName = nil
@@ -62,7 +62,7 @@ local PlayerInfoDropdown = Tab:AddDropdown({
     Options = {},
     Callback = function(Value)
         selectedPlayerName = Value
-    end    
+    end
 })
 
 Tab:AddButton({
@@ -90,14 +90,9 @@ Tab:AddButton({
         end
 
         LocalPlayer:SetAttribute("RequestPlayerInfo", selectedPlayerName)
-
-        OrionLib:MakeNotification({
-            Name = "Send request",
-            Content = "Information " .. selectedPlayerName .. " send...",
-            Image = "rbxassetid://4483345998",
-            Time = 4
-        })
-    end    
+        
+        print("✅ Запрос на информацию об игроке отправлен: " .. selectedPlayerName)
+    end
 })
 
 Tab:AddButton({
@@ -112,14 +107,16 @@ Tab:AddButton({
         table.sort(options)
         if #options == 0 then options = {"No Players"} end
         PlayerInfoDropdown:Refresh(options)
-    end    
+    end
 })
 
 task.spawn(function()
     task.wait(1)
     local options = {}
     for _, plr in ipairs(Players:GetPlayers()) do
-        if plr ~= LocalPlayer then table.insert(options, plr.Name) end
+        if plr ~= LocalPlayer then 
+            table.insert(options, plr.Name) 
+        end
     end
     table.sort(options)
     PlayerInfoDropdown:Refresh(options)
