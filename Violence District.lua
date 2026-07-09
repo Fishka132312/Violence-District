@@ -1,4 +1,4 @@
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---паппп
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---вфа
 local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = false, SaveConfig = true, ConfigFolder = "Violence District meowl"})
 
 local scripts = {
@@ -153,23 +153,6 @@ Tab:AddButton({
             print("✅ " .. selected .. " added to whitelist")
         end
     end
-})Tab:AddButton({
-    Name = "Add / Remove to WhiteList",
-    Callback = function()
-        local selected = _G.SelectedPlayer
-        
-        if not selected or selected == "" then
-            print("❌ Сначала выбери игрока")
-            return
-        end
-
-        if table.find(_G.Whitelist, selected) then
-            print("⚠️ " .. selected .. " уже в whitelist")
-        else
-            table.insert(_G.Whitelist, selected)
-            print("✅ " .. selected .. " добавлен в whitelist")
-        end
-    end
 })
 
 Tab:AddButton({
@@ -274,12 +257,19 @@ local Section = Tab:AddSection({
 	Name = "Emotes"
 })
 
+task.wait(1.5)
+
+local allEmotes = getgenv().GetAllEmotes and getgenv().GetAllEmotes() or {"No Emotes Found"}
+
+local selectedEmote = allEmotes[1] or "No Emotes Found"
+
 Tab:AddDropdown({
     Name = "Select Emote",
-    Default = allEmotes[1] or "No Emotes",
+    Default = selectedEmote,
     Options = allEmotes,
     Callback = function(Value)
-        if Value and Value ~= "No Emotes" then
+        if Value and Value ~= "No Emotes Found" then
+            selectedEmote = Value
             getgenv().PlayEmoteByName(Value)
         end
     end
@@ -290,7 +280,9 @@ Tab:AddToggle({
     Default = false,
     Callback = function(Value)
         if Value then
-            local currentDropdown = "Current selected emote"
+            if selectedEmote and selectedEmote ~= "No Emotes Found" then
+                getgenv().PlayEmoteByName(selectedEmote)
+            end
         else
             getgenv().StopCurrentEmote()
         end
