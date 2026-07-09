@@ -75,13 +75,21 @@ local LocalPlayer = Players.LocalPlayer
 Tab:AddSlider({
 	Name = "Killer Speed",
 	Min = 0,
-	Max = 100,
-	Default = 20,
+	Max = 20,
+	Default = 5,
 	Color = Color3.fromRGB(255,255,255),
 	Increment = 1,
 	ValueName = "speed",
 	Callback = function(Value)
 		_G.KillerSpeed = Value
+		
+		local character = LocalPlayer.Character
+		if character then
+			local humanoid = character:FindFirstChild("Humanoid")
+			if humanoid and _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+				humanoid.WalkSpeed = Value
+			end
+		end
 	end    
 })
 
@@ -94,10 +102,11 @@ Tab:AddToggle({
 		local character = LocalPlayer.Character
 		if character then
 			local humanoid = character:FindFirstChild("Humanoid")
-			if humanoid and not Value then
-				local targetSpeed = 16
-				if humanoid.WalkSpeed == _G.KillerSpeed then
-					humanoid.WalkSpeed = targetSpeed
+			if humanoid then
+				if Value and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+					humanoid.WalkSpeed = _G.KillerSpeed
+				else
+					humanoid.WalkSpeed = 16
 				end
 			end
 		end
