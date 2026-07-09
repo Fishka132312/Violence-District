@@ -37,6 +37,14 @@ if #_G.EmoteList == 0 then
     _G.EmoteList = {"Эмоции не найдены"}
 end
 
+-------------------------Visual---------------------------
+
+local Tab = Window:MakeTab({
+	Name = "Visual",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
 -------------------------Killer---------------------------
 
 local Tab = Window:MakeTab({
@@ -75,7 +83,7 @@ local LocalPlayer = Players.LocalPlayer
 Tab:AddSlider({
 	Name = "Killer Speed",
 	Min = 0,
-	Max = 20,
+	Max = 100,
 	Default = 5,
 	Color = Color3.fromRGB(255,255,255),
 	Increment = 1,
