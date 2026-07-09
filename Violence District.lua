@@ -9,6 +9,7 @@ local scripts = {
 	'Visual/PlayersEsp.lua',
 	'Visual/GeneratorEsp.lua',
 	'Visual/HooksEsp.lua',
+	'Survivors/BypassGates.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
@@ -39,6 +40,22 @@ end
 if #_G.EmoteList == 0 then
     _G.EmoteList = {"Эмоции не найдены"}
 end
+
+-------------------------Survivors---------------------------
+
+local Tab = Window:MakeTab({
+	Name = "Survivors",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+Tab:AddToggle({
+	Name = "Bypass Gates",
+	Default = false,
+	Callback = function(Value)
+		_G.BypassGates = Value
+	end    
+})
 
 -------------------------Visual---------------------------
 
