@@ -136,7 +136,7 @@ Tab:AddButton({
             print("❌ Выбери игрока")
             return
         end
-        
+       
         local index = table.find(_G.Whitelist, selected)
         if index then
             table.remove(_G.Whitelist, index)
@@ -162,12 +162,13 @@ Tab:AddButton({
     end
 })
 
+-- Автообновление dropdown каждые 5 секунд
 task.spawn(function()
     while true do
         task.wait(5)
         if PlayerDropdown and typeof(PlayerDropdown.Refresh) == "function" then
             local options = _G.PlayerList or {}
-            
+           
             if #options == 0 then
                 options = {"Нет игроков"}
             else
@@ -181,11 +182,12 @@ task.spawn(function()
                 end
                 table.sort(options)
             end
-            
+           
             PlayerDropdown:Refresh(options)
         end
     end
 end)
+
 Tab:AddToggle({
 	Name = "Auto Attack",
 	Default = false,
