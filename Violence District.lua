@@ -7,6 +7,7 @@ local scripts = {
 	'Killer/AutoCarry.lua',
 	'Killer/KillerSpeed.lua',
 	'Visual/PlayersEsp.lua',
+	'Visual/GeneratorEsp.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
@@ -46,6 +47,10 @@ local Tab = Window:MakeTab({
 	PremiumOnly = false
 })
 
+local Section = Tab:AddSection({
+	Name = "Players"
+})
+
 Tab:AddToggle({
 	Name = "Esp Killer",
 	Default = false,
@@ -67,6 +72,18 @@ Tab:AddToggle({
 	Default = false,
 	Callback = function(Value)
 		_G.EspSpectator = Value
+	end    
+})
+
+local Section = Tab:AddSection({
+	Name = "Things"
+})
+
+Tab:AddToggle({
+	Name = "Esp Generators",
+	Default = false,
+	Callback = function(Value)
+		_G.EspGenerators = Value
 	end    
 })
 
