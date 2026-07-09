@@ -16,23 +16,19 @@ for _, emote in ipairs(EmotesFolder:GetChildren()) do
         table.insert(_G.EmoteList, emote.Name)
     end
 end
-
 table.sort(_G.EmoteList)
 
+print("[Emote Core] Скрипт загружен. Найдено эмоций: " .. #_G.EmoteList)
+
 local function playEmote()
-    if _G.SelectedEmote and _G.SelectedEmote ~= "" then
+    if _G.SelectedEmote and _G.SelectedEmote ~= "" and _G.SelectedEmote ~= "Эмоции не найдены" then
         local args = { _G.SelectedEmote }
         EmoteRemote:FireServer(unpack(args))
-        print("[Emote Core] Ремоут отправлен 1 раз для: " .. _G.SelectedEmote)
     end
 end
 
 task.spawn(function()
-    while true do
-        if _G.EmoteScriptID ~= currentSessionID then 
-            break 
-        end
-
+    while _G.EmoteScriptID == currentSessionID do
         if _G.EmoteLoopActive and (_G.EmoteLoopActive ~= lastState or _G.SelectedEmote ~= lastEmote) then
             playEmote()
             lastEmote = _G.SelectedEmote
@@ -41,9 +37,46 @@ task.spawn(function()
             lastState = false
             lastEmote = nil
         end
-        
         task.wait(0.05)
     end
 end)
 
-print("[Emote Core] Скрипт загружен. Найдено эмоций: " .. #_G.EmoteList)
+local EmoteDropdown = Tab:AddDropdown({
+    Name = "Choose Emote",
+    Default = nil,
+    Options = {"Загрузка эмоций..."},
+    Callback = function(Value)
+        if Value and Value ~= "Эмоции не найдены" then
+            _G.SelectedEmote = Value
+            print("Выбрана эмоция: " .. Value)
+        end
+    end
+})
+
+local function RefreshEmoteDropdown()
+    local options = _G.EmoteList or {}
+    
+    if #options == 0 then
+        options = {"Эмоции не найдены"}
+    else
+        local clean = {}
+        for _, name in ipairs(options) do
+            if name and name ~= "" then
+                table.insert(clean, name)
+            end
+        end
+        table.sort(clean)
+        options = clean
+    end
+
+    if EmoteDropdown and typeof(EmoteDropdown.Refresh) == "function" then
+        EmoteDropdown:Refresh(options)
+        
+        if _G.SelectedEmote and table.find(options, _G.SelectedEmote) then
+            EmoteDropdown:Set(_G.SelectedEmote)
+        end
+    end
+end
+
+task.wait(0.5)
+RefreshEmoteDropdown()
