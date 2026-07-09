@@ -3,16 +3,15 @@ local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = fa
 
 local scripts = {
     'Emotes.lua',
+	'Killer/AutoAtack.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
 
--- Инициализируем переменные заранее, чтобы Orion Lib не выдавал ошибку, если загрузка задержится
 _G.EmoteList = _G.EmoteList or {}
 _G.SelectedEmote = _G.SelectedEmote or nil
 _G.EmoteLoopActive = _G.EmoteLoopActive or false
 
--- Загружаем скрипты СИНХРОННО (без task.spawn), чтобы дождаться заполнения _G.EmoteList
 for i, scriptName in ipairs(scripts) do
     local fullUrl = baseUrl .. scriptName
     
@@ -29,13 +28,28 @@ for i, scriptName in ipairs(scripts) do
         warn("Ошибка при загрузке " .. scriptName .. ": " .. tostring(err))
     end
     
-    task.wait(0.5) -- Небольшая задержка между скриптами, если их будет больше
+    task.wait(0.5)
 end
 
--- Защита от краша Orion Lib: если папка пустая или скрипт не скачался, делаем дефолтный список
 if #_G.EmoteList == 0 then
     _G.EmoteList = {"Эмоции не найдены"}
 end
+
+-------------------------Killer---------------------------
+
+local Tab = Window:MakeTab({
+	Name = "Killer",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+Tab:AddToggle({
+	Name = "Auto Atack",
+	Default = false,
+	Callback = function(Value)
+		_G.AutoAttackKiller = Value
+	end    
+})
 
 -------------------------Emotes---------------------------
 
@@ -45,9 +59,8 @@ local Tab = Window:MakeTab({
 	PremiumOnly = false
 })
 
--- Дропдаун
 Tab:AddDropdown({
-	Name = "Выбрать Эмоцию",
+	Name = "Choose Emote",
 	Default = _G.EmoteList[1], 
 	Options = _G.EmoteList, 
 	Callback = function(Value)
@@ -58,9 +71,8 @@ Tab:AddDropdown({
 	end    
 })
 
--- Чекбокс (Toggle)
 Tab:AddToggle({
-	Name = "Воспроизводить эмоцию",
+	Name = "Start Emote",
 	Default = false,
 	Callback = function(Value)
 		_G.EmoteLoopActive = Value
