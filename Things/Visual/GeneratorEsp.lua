@@ -1,4 +1,4 @@
-local SCRIPT_TAG = "EspGen"
+local SCRIPT_TAG = "EspGen" --545435
 if _G[SCRIPT_TAG] then
     _G[SCRIPT_TAG]()
 end
@@ -72,7 +72,7 @@ local function createGenESP(genTarget)
         label.Parent = billboard
         
         billboard.Parent = rootPart
-        activeVisuals = activeGenVisuals[genTarget].Billboard = billboard
+        activeGenVisuals[genTarget].Billboard = billboard
     end
 
     local localRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -119,4 +119,4 @@ local function cleanup()
 end
 
 _G[SCRIPT_TAG] = cleanup
-print("[GEN ESP INITIALIZED] Скрипт генераторов (поиск в Map) запущен!")
+print("[GEN ESP INITIALIZED] Скрипт генераторов (сканирование всей карты Map) запущен!")
