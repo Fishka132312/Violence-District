@@ -18,23 +18,18 @@ local LocalPlayer = Players.LocalPlayer
 local AttackRemote = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Attacks"):WaitForChild("BasicAttack")
 local args = { false }
 
+-- Обновленная функция под кастомное Property модели персонажа
 local function isCarryingSomething(character)
 	if not character then return false end
 	
-	-- Проверка, если IsCarrying это BoolValue внутри персонажа
-	local carryingValue = character:FindFirstChild("IsCarrying")
-	if carryingValue and carryingValue:IsA("BoolValue") then
-		return carryingValue.Value
-	end
+	-- Безопасно проверяем существование свойства в модели (в Workspace)
+	local success, result = pcall(function() 
+		return character.IsCarrying 
+	end)
 	
-	local carryingAttribute = character:GetAttribute("IsCarrying")
-	if carryingAttribute ~= nil then
-		return carryingAttribute
-	end
-	
-	local success, result = pcall(function() return character.IsCarrying end)
-	if success and type(result) == "boolean" then
-		return result
+	-- Если свойство прочиталось и оно равно true, возвращаем true
+	if success and result == true then
+		return true
 	end
 
 	return false
