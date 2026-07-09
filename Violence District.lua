@@ -6,6 +6,7 @@ local scripts = {
 	'Killer/AutoAttack.lua',
 	'Killer/AutoCarry.lua',
 	'Killer/KillerSpeed.lua',
+	'Visual/PlayersEsp.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
@@ -43,6 +44,30 @@ local Tab = Window:MakeTab({
 	Name = "Visual",
 	Icon = "rbxassetid://4483345998",
 	PremiumOnly = false
+})
+
+Tab:AddToggle({
+	Name = "Esp Killer",
+	Default = false,
+	Callback = function(Value)
+		_G.EspKiller = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Esp Survivors",
+	Default = false,
+	Callback = function(Value)
+		_G.EspSurvivors = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Esp Spectator",
+	Default = false,
+	Callback = function(Value)
+		_G.EspSpectator = Value
+	end    
 })
 
 -------------------------Killer---------------------------
