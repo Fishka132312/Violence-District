@@ -11,6 +11,7 @@ local scripts = {
 	'Visual/GeneratorEsp.lua',
 	'Visual/HooksEsp.lua',
 	'Survivors/BypassGates.lua',
+	'Survivors/SelfHeal.lua',
 	'Whitelist.lua',
 }
 
@@ -104,11 +105,60 @@ local Section = Tab:AddSection({
 })
 
 Tab:AddToggle({
+	Name = "SelfHeal",
+	Default = false,
+	Callback = function(Value)
+		_G.Autoheal = Value
+	end    
+})
+
+Tab:AddToggle({
 	Name = "Bypass Gates",
 	Default = false,
 	Callback = function(Value)
 		_G.BypassGates = Value
 	end    
+})
+
+Tab:AddSlider({
+    Name = "Survivor Speed",
+    Min = 0,
+    Max = 100,
+    Default = 16,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "speed",
+    Callback = function(Value)
+        _G.SurvivorSpeed = Value
+        
+        local character = LocalPlayer.Character
+        if character then
+            local humanoid = character:FindFirstChild("Humanoid")
+            if humanoid and _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
+                humanoid.WalkSpeed = Value
+            end
+        end
+    end
+})
+
+Tab:AddToggle({
+    Name = "Apply Speed",
+    Default = false,
+    Callback = function(Value)
+        _G.SpeedToggle = Value
+        
+        local character = LocalPlayer.Character
+        if character then
+            local humanoid = character:FindFirstChild("Humanoid")
+            if humanoid then
+                if Value and LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
+                    humanoid.WalkSpeed = _G.SurvivorSpeed
+                else
+                    humanoid.WalkSpeed = 16
+                end
+            end
+        end
+    end
 })
 
 -------------------------Killer---------------------------
