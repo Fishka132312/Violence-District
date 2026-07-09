@@ -16,6 +16,7 @@ local scripts = {
 	'Survivors/BypassGates.lua',
 	'Survivors/SelfHeal.lua',
 	'Survivors/SurvivorSpeed.lua',
+	'Survivors/AutoSkillCheck.lua',
 	'Whitelist.lua',
 }
 
@@ -121,6 +122,14 @@ Tab:AddToggle({
 	Default = false,
 	Callback = function(Value)
 		_G.BypassGates = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Auto Skill Check",
+	Default = false,
+	Callback = function(Value)
+		_G.AutoSkillCheck = Value
 	end    
 })
 
