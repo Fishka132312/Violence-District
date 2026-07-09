@@ -1,4 +1,4 @@
-local Players = game:GetService("Players")
+local Players = game:GetService("Players") ---вф
 local LocalPlayer = Players.LocalPlayer
 
 local currentSession = os.clock()
@@ -9,7 +9,8 @@ _G.SpeedToggle = _G.SpeedToggle or false
 local defaultSpeed = 16
 
 local function monitorSpeed(character)
-	local humanoid = character:WaitForChild("Humanoid")
+	local humanoid = character:WaitForChild("Humanoid", 5)
+	if not humanoid then return end
 	
 	defaultSpeed = humanoid.WalkSpeed
 
@@ -35,7 +36,7 @@ local function monitorSpeed(character)
 end
 
 if LocalPlayer.Character then
-	monitorSpeed(LocalPlayer.Character)
+	task.spawn(monitorSpeed, LocalPlayer.Character)
 end
 
 if _G.CharacterAddedConnection then _G.CharacterAddedConnection:Disconnect() end
