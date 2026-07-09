@@ -1,4 +1,4 @@
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---xxxxx
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---паппп
 local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = false, SaveConfig = true, ConfigFolder = "Violence District meowl"})
 
 local scripts = {
@@ -125,8 +125,8 @@ else
 
     local PlayerDropdown = Tab:AddDropdown({
         Name = "Choose Player",
-        Default = "Загрузка игроков...",
-        Options = {"Загрузка игроков..."},
+        Default = "",
+        Options = {},
         Callback = function(Value)
             _G.SelectedPlayer = Value
             print("Выбран: " .. Value)
@@ -137,11 +137,11 @@ else
         Name = "Add / Remove Whitelist",
         Callback = function()
             local selected = _G.SelectedPlayer
-            if not selected or selected == "Загрузка игроков..." or selected == "Нет игроков" then
+            if not selected or selected == "" then
                 print("❌ Выбери игрока")
                 return
             end
-          
+         
             local index = table.find(_G.Whitelist, selected)
             if index then
                 table.remove(_G.Whitelist, index)
@@ -153,31 +153,41 @@ else
         end
     })
 
-
-    task.spawn(function()
-        while true do
-            task.wait(5)
-            if PlayerDropdown and typeof(PlayerDropdown.Refresh) == "function" then
-                local options = _G.PlayerList or {}
-              
-                if #options == 0 then
-                    options = {"Нет игроков"}
-                else
-                    local unique = {}
-                    for _, v in ipairs(options) do
-                        unique[v] = true
-                    end
-                    options = {}
-                    for name in pairs(unique) do
-                        table.insert(options, name)
-                    end
-                    table.sort(options)
-                end
-              
-                PlayerDropdown:Refresh(options)
+    Tab:AddButton({
+        Name = "Показать Whitelist",
+        Callback = function()
+            if #_G.Whitelist == 0 then
+                print("Whitelist пуст")
+                return
+            end
+            print("=== WHITELIST ===")
+            for _, name in ipairs(_G.Whitelist) do
+                print(" - " .. name)
             end
         end
-    end)
+    })
+
+    Tab:AddButton({
+        Name = "🔄 Обновить список игроков",
+        Callback = function()
+            local options = _G.PlayerList or {}
+            if #options == 0 then
+                options = {"Нет игроков"}
+            else
+                local unique = {}
+                for _, v in ipairs(options) do
+                    unique[v] = true
+                end
+                options = {}
+                for name in pairs(unique) do
+                    table.insert(options, name)
+                end
+                table.sort(options)
+            end
+            PlayerDropdown:Refresh(options)
+            print("Список обновлён (" .. #options .. " игроков)")
+        end
+    })
 end
 
 Tab:AddToggle({
@@ -258,21 +268,21 @@ local Tab = Window:MakeTab({
 
 local EmoteDropdown = Tab:AddDropdown({
     Name = "Choose Emote",
-    Default = nil,
-    Options = {"Загрузка эмоций..."},
+    Default = "",
+    Options = {},
     Callback = function(Value)
-        if Value and Value ~= "Эмоции не найдены" and Value ~= "Загрузка эмоций..." then
+        if Value and Value ~= "Эмоции не найдены" then
             _G.SelectedEmote = Value
             print("Выбрана эмоция: " .. Value)
         end
     end
 })
 
-local function RefreshEmoteDropdown()
+task.delay(1, function()
     if not EmoteDropdown then return end
-
-    local options = _G.EmoteList or {}
     
+    local options = _G.EmoteList or {}
+   
     if #options == 0 then
         options = {"Эмоции не найдены"}
     else
@@ -286,11 +296,10 @@ local function RefreshEmoteDropdown()
         end
         table.sort(options)
     end
-
+    
     EmoteDropdown:Refresh(options)
-end
-
-task.delay(1, RefreshEmoteDropdown)
+    print("Список эмоций загружен (" .. #options .. " шт.)")
+end)
 
 Tab:AddToggle({
 	Name = "Start Emote",
