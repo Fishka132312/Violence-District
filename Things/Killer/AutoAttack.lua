@@ -7,7 +7,7 @@ _G.AutoAttackScriptRunning = true
 local currentScriptId = os.clock()
 _G.CurrentAutoAttackId = currentScriptId
 
-local MAX_DISTANCE = 20
+local MAX_DISTANCE = 5
 local ATTACK_COOLDOWN = 1
 
 local Players = game:GetService("Players")
