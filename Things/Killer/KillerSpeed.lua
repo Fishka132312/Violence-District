@@ -1,4 +1,4 @@
-local Players = game:GetService("Players") ---вф
+local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 local currentSession = os.clock()
@@ -7,6 +7,8 @@ _G.ScriptSessionID = currentSession
 _G.KillerSpeed = _G.KillerSpeed or 5
 _G.SpeedToggle = _G.SpeedToggle or false
 local defaultSpeed = 16
+
+local isChangingSpeed = false 
 
 local function monitorSpeed(character)
 	local humanoid = character:WaitForChild("Humanoid", 5)
@@ -18,20 +20,25 @@ local function monitorSpeed(character)
 	
 	_G.SpeedConnection = humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
 		if _G.ScriptSessionID ~= currentSession then return end
+		if isChangingSpeed then return end
 		
 		if _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
 			if humanoid.WalkSpeed ~= _G.KillerSpeed then
+				defaultSpeed = humanoid.WalkSpeed
+				
+				isChangingSpeed = true
 				humanoid.WalkSpeed = _G.KillerSpeed
+				isChangingSpeed = false
 			end
 		else
-			if humanoid.WalkSpeed == _G.KillerSpeed then
-				humanoid.WalkSpeed = defaultSpeed
-			end
+			defaultSpeed = humanoid.WalkSpeed
 		end
 	end)
 
 	if _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+		isChangingSpeed = true
 		humanoid.WalkSpeed = _G.KillerSpeed
+		isChangingSpeed = false
 	end
 end
 
