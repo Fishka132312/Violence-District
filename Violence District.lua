@@ -2,7 +2,8 @@ local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jen
 local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = false, SaveConfig = true, ConfigFolder = "Violence District meowl"})
 
 local scripts = {
-    'Emotes.lua',
+    'Emotes/Emotes.lua',
+	'Emotes/AnimationSpeed.lua',
 	'Killer/AutoAttack.lua',
 	'Killer/AutoCarry.lua',
 	'Killer/KillerSpeed.lua',
@@ -319,6 +320,32 @@ Tab:AddToggle({
 			print("Цикл эмоции остановлен.")
 		end
 	end    
+})
+
+Tab:AddSlider({
+    Name = "Emote Speed",
+    Min = 1,
+    Max = 20,
+    Default = 5,
+    Color = Color3.fromRGB(255, 100, 100),
+    Increment = 0.1,
+    ValueName = "x",
+    Callback = function(Value)
+        currentSliderValue = Value
+        if getgenv().SetAnimationSpeed then
+            getgenv().SetAnimationSpeed(Value)
+        end
+    end
+})
+
+Tab:AddToggle({
+    Name = "Sped Up Emote",
+    Default = false,
+    Callback = function(Value)
+        if getgenv().ToggleAnimationSpeed then
+            getgenv().ToggleAnimationSpeed(Value)
+        end
+    end
 })
 
 -------------------------Shader---------------------------
