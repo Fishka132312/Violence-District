@@ -2,10 +2,10 @@ local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jen
 local Window = OrionLib:MakeWindow({Name = "+1Keyboard", HidePremium = false, SaveConfig = true, ConfigFolder = "+1Keyboard"})
 
 local scripts = {
-    '',
+    'Emotes.lua',
 }
 
-local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/-1keyboard/refs/heads/main/Things/'
+local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
 
 task.spawn(function()
     for i, scriptName in ipairs(scripts) do
@@ -28,6 +28,37 @@ task.spawn(function()
     end
 end)
 
+-------------------------Emotes---------------------------
+
+local Tab = Window:MakeTab({
+	Name = "Emotes",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+Tab:AddDropdown({
+	Name = "Выбрать Эмоцию",
+	Default = _G.EmoteList[1] or "Нет эмоций", -- Ставим первую по дефолту, если папка не пуста
+	Options = _G.EmoteList, -- Передаем массив, который собрал первый скрипт
+	Callback = function(Value)
+		_G.SelectedEmote = Value
+		print("Выбрана эмоция: " .. tostring(_G.SelectedEmote))
+	end    
+})
+
+-- Чекбокс (Toggle) для старта/остановки
+Tab:AddToggle({
+	Name = "Воспроизводить эмоцию",
+	Default = false,
+	Callback = function(Value)
+		_G.EmoteLoopActive = Value
+		if Value then
+			print("Цикл эмоции запущен для: " .. tostring(_G.SelectedEmote))
+		else
+			print("Цикл эмоции остановлен.")
+		end
+	end    
+})
 
 -------------------------Shader---------------------------
 
