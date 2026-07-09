@@ -137,32 +137,23 @@ local PlayerDropdown = Tab:AddDropdown({
 })
 
 Tab:AddButton({
-    Name = "➕ Добавить в Whitelist",
+    Name = "Add / Remove Whitelist",
     Callback = function()
         local selected = _G.SelectedPlayer
-        if selected and selected ~= "Загрузка игроков..." and selected ~= "Нет игроков" then
-            if not table.find(_G.Whitelist, selected) then
-                table.insert(_G.Whitelist, selected)
-                print("✅ " .. selected .. " добавлен в whitelist")
-            else
-                print("⚠️ " .. selected .. " уже в whitelist")
-            end
-        else
-            print("❌ Выбери игрока")
-        end
-    end
-})
-
-Tab:AddButton({
-    Name = "Показать Whitelist",
-    Callback = function()
-        if #_G.Whitelist == 0 then
-            print("Whitelist пуст")
+        
+        if not selected or selected == "Загрузка игроков..." or selected == "Нет игроков" then
+            print("❌ Choose Player")
             return
         end
-        print("=== WHITELIST (" .. #_G.Whitelist .. " игроков) ===")
-        for _, name in ipairs(_G.Whitelist) do
-            print(" - " .. name)
+
+        local index = table.find(_G.Whitelist, selected)
+        
+        if index then
+            table.remove(_G.Whitelist, index)
+            print("➖ " .. selected .. " removed from whitelist")
+        else
+            table.insert(_G.Whitelist, selected)
+            print("✅ " .. selected .. " added to whitelist")
         end
     end
 })
@@ -170,7 +161,7 @@ Tab:AddButton({
 task.spawn(function()
     while task.wait(5) do
         if PlayerDropdown and typeof(PlayerDropdown.Refresh) == "function" then
-            local options = _G.PlayerList
+            local options = _G.PlayerList or {}
             if #options == 0 then
                 options = {"Нет игроков"}
             end
