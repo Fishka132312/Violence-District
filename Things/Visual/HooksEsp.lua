@@ -119,4 +119,4 @@ local function cleanup()
 end
 
 _G[SCRIPT_TAG] = cleanup
-print("[HOOK ESP INITIALIZED] Скрипт крюков (поиск в Map) запущен!")
+print("[HOOK ESP INITIALIZED] Скрипт крюков (сканирование всей карты Map) запущен!")
