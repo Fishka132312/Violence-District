@@ -34,22 +34,6 @@ for i, scriptName in ipairs(scripts) do
     task.wait(0.5)
 end
 
--------------------------Survivors---------------------------
-
-local Tab = Window:MakeTab({
-	Name = "Survivors",
-	Icon = "rbxassetid://4483345998",
-	PremiumOnly = false
-})
-
-Tab:AddToggle({
-	Name = "Bypass Gates",
-	Default = false,
-	Callback = function(Value)
-		_G.BypassGates = Value
-	end    
-})
-
 -------------------------Visual---------------------------
 
 local Tab = Window:MakeTab({
@@ -106,12 +90,36 @@ Tab:AddToggle({
 	end    
 })
 
+-------------------------Survivors---------------------------
+
+local Tab = Window:MakeTab({
+	Name = "Survivors",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+	Name = "da"
+})
+
+Tab:AddToggle({
+	Name = "Bypass Gates",
+	Default = false,
+	Callback = function(Value)
+		_G.BypassGates = Value
+	end    
+})
+
 -------------------------Killer---------------------------
 
 local Tab = Window:MakeTab({
 	Name = "Killer",
 	Icon = "rbxassetid://4483345998",
 	PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+	Name = "WhiteList"
 })
 
 local PlayerDropdown = Tab:AddDropdown({
@@ -125,6 +133,26 @@ local PlayerDropdown = Tab:AddDropdown({
 })
 
 Tab:AddButton({
+    Name = "Add / Remove from Whitelist",
+    Callback = function()
+        local selected = _G.SelectedPlayer
+        
+        if not selected or selected == "" then
+            print("❌ Please select a player first")
+            return
+        end
+
+        local index = table.find(_G.Whitelist, selected)
+        
+        if index then
+            table.remove(_G.Whitelist, index)
+            print("➖ " .. selected .. " removed from whitelist")
+        else
+            table.insert(_G.Whitelist, selected)
+            print("✅ " .. selected .. " added to whitelist")
+        end
+    end
+})Tab:AddButton({
     Name = "Add / Remove to WhiteList",
     Callback = function()
         local selected = _G.SelectedPlayer
@@ -157,6 +185,10 @@ Tab:AddButton({
     end
 })
 
+local Section = Tab:AddSection({
+	Name = "Auto"
+})
+
 Tab:AddToggle({
 	Name = "Auto Attack",
 	Default = false,
@@ -179,6 +211,10 @@ Tab:AddToggle({
 	Callback = function(Value)
 		_G.AutoHook = Value
 	end    
+})
+
+local Section = Tab:AddSection({
+	Name = "Misc"
 })
 
 local Players = game:GetService("Players")
@@ -231,6 +267,10 @@ local Tab = Window:MakeTab({
 	Name = "Emotes",
 	Icon = "rbxassetid://4483345998",
 	PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+	Name = "Emotes	"
 })
 
 local EmoteDropdown = Tab:AddDropdown({
