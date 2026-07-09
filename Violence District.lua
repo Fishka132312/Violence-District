@@ -271,55 +271,30 @@ local Tab = Window:MakeTab({
 })
 
 local Section = Tab:AddSection({
-	Name = "Emotes	"
+	Name = "Emotes"
 })
 
-local EmoteDropdown = Tab:AddDropdown({
-    Name = "Choose Emote",
-    Default = "",
-    Options = {},
+Tab:AddDropdown({
+    Name = "Select Emote",
+    Default = allEmotes[1] or "No Emotes",
+    Options = allEmotes,
     Callback = function(Value)
-        if Value and Value ~= "Эмоции не найдены" then
-            _G.SelectedEmote = Value
-            print("Выбрана эмоция: " .. Value)
+        if Value and Value ~= "No Emotes" then
+            getgenv().PlayEmoteByName(Value)
         end
     end
 })
-
-task.delay(1, function()
-    if not EmoteDropdown then return end
-    
-    local options = _G.EmoteList or {}
-   
-    if #options == 0 then
-        options = {"Эмоции не найдены"}
-    else
-        local unique = {}
-        for _, name in ipairs(options) do
-            unique[name] = true
-        end
-        options = {}
-        for name in pairs(unique) do
-            table.insert(options, name)
-        end
-        table.sort(options)
-    end
-    
-    EmoteDropdown:Refresh(options)
-    print("Список эмоций загружен (" .. #options .. " шт.)")
-end)
 
 Tab:AddToggle({
-	Name = "Start Emote",
-	Default = false,
-	Callback = function(Value)
-		_G.EmoteLoopActive = Value
-		if Value then
-			print("Цикл эмоции запущен для: " .. tostring(_G.SelectedEmote))
-		else
-			print("Цикл эмоции остановлен.")
-		end
-	end    
+    Name = "Start / Stop Emote",
+    Default = false,
+    Callback = function(Value)
+        if Value then
+            local currentDropdown = "Current selected emote"
+        else
+            getgenv().StopCurrentEmote()
+        end
+    end
 })
 
 Tab:AddSlider({
