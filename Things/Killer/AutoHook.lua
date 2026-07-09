@@ -1,0 +1,50 @@
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local RunService = game:GetService("RunService")
+
+local LocalPlayer = Players.LocalPlayer
+local CarryEvent = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Carry"):WaitForChild("CarrySurvivorEvent")
+
+_G.AutoHook = false
+
+local function getClosestPlayer()
+	local closestPlayer = nil
+	local shortestDistance = 5
+
+	if not LocalPlayer.Character or not LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+		return nil
+	end
+
+	local myPos = LocalPlayer.Character.HumanoidRootPart.Position
+
+	for _, player in ipairs(Players:GetPlayers()) do
+		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+			local targetPos = player.Character.HumanoidRootPart.Position
+			local distance = (myPos - targetPos).Magnitude
+
+			if distance <= shortestDistance then
+				shortestDistance = distance
+				closestPlayer = player
+			end
+		end
+	end
+
+	return closestPlayer
+end
+
+if _G.AutoHookConnection then
+	_G.AutoHookConnection:Disconnect()
+	_G.AutoHookConnection = nil
+end
+
+_G.AutoHookConnection = RunService.Heartbeat:Connect(function()
+	if not _G.AutoHook then return end
+
+	local targetPlayer = getClosestPlayer()
+	if targetPlayer and targetPlayer.Character then
+		local args = {
+			[1] = targetPlayer.Character
+		}
+		CarryEvent:FireServer(unpack(args))
+	end
+end)
