@@ -1,4 +1,4 @@
-local SCRIPT_TAG = "Esp" -------656546
+local SCRIPT_TAG = "Esp"
 if _G[SCRIPT_TAG] then
     _G[SCRIPT_TAG]()
 end
@@ -19,7 +19,7 @@ if _G.EspSurvivors == nil then _G.EspSurvivors = false end
 if _G.EspSpectator == nil then _G.EspSpectator = false end
 
 local activeVisuals = {}
-local lastLoggedState = {} -- Для предотвращения спама принтами
+local lastLoggedState = {}
 
 local function isEspEnabledForTeam(teamName)
     if teamName == "Killer" then return _G.EspKiller end
@@ -44,12 +44,10 @@ local function createESP(player, character)
     
     local isEnabled = isEspEnabledForTeam(teamName)
     
-    -- ДЕБАГ ПРИНТ 1: Пишет в консоль один раз при смене статуса команды игрока
     local logKey = player.Name .. "_" .. teamName .. "_" .. tostring(isEnabled)
     if lastLoggedState[player.Name] ~= logKey then
         lastLoggedState[player.Name] = logKey
-        print(string.format("[ESP DEBUG] Игрок: %s | Команда в игре: '%s' | ESP для неё включен? %s", player.Name, teamName, tostring(isEnabled)))
-        print(string.format("[ESP DEBUG] Текущие глобалки: Killer=%s, Survivors=%s, Spectator=%s", tostring(_G.EspKiller), tostring(_G.EspSurvivors), tostring(_G.EspSpectator)))
+        print(string.format("[ESP DEBUG] Игрок: %s | Команда в игре: '%s' | ESP включен? %s", player.Name, teamName, tostring(isEnabled)))
     end
 
     if not isEnabled then
@@ -60,35 +58,26 @@ local function createESP(player, character)
     local rootPart = character:FindFirstChild("HumanoidRootPart")
     local humanoid = character:FindFirstChildOfClass("Humanoid")
     
-    -- ДЕБАГ ПРИНТ 2: Если ESP включен, но у персонажа нет нужных частей
-    if not rootPart or not humanoid then
-        if not rootPart then warn("[ESP WARN] У " .. player.Name .. " не найден HumanoidRootPart!") end
-        if not humanoid then warn("[ESP WARN] У " .. player.Name .. " не найден Humanoid!") end
+    if not rootPart or not humanoid or humanoid.Health <= 0 then 
         removeESP(player)
         return 
-    end
-    
-    if humanoid.Health <= 0 then
-        removeESP(player)
-        return
     end
 
     local teamColor = TEAM_COLORS[teamName] or TEAM_COLORS["Default"]
 
     if not activeVisuals[player] then
         activeVisuals[player] = {}
-        print("[ESP SUCCESS] Создаем подсветку для игрока: " .. player.Name)
     end
 
-    -- Создание/обновление Highlight
+    -- ИСПРАВЛЕНО: Правильные свойства для Highlight
     local highlight = activeVisuals[player].Highlight
     if not highlight or highlight.Parent ~= character then
         if highlight then highlight:Destroy() end
         highlight = Instance.new("Highlight")
         highlight.Name = "ESPHighlight"
         highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-        highlight.FillAlpha = 0.25
-        highlight.OutlineAlpha = 1
+        highlight.FillTransparency = 0.75     -- Прозрачность заливки (0 - плотная, 1 - невидимая)
+        highlight.OutlineTransparency = 0    -- Прозрачность контура (0 - жирный четкий контур)
         highlight.Parent = character
         activeVisuals[player].Highlight = highlight
     end
@@ -136,7 +125,6 @@ connection = RunService.RenderStepped:Connect(function()
     for _, player in ipairs(Players:GetPlayers()) do
         local character = player.Character
         if character then
-            -- Убрали pcall, чтобы видеть реальные ошибки в F9, если они возникнут
             createESP(player, character)
         else
             removeESP(player)
@@ -153,4 +141,4 @@ local function cleanup()
 end
 
 _G[SCRIPT_TAG] = cleanup
-print("[ESP INITIALIZED] Скрипт запущен, ждем переключения тугглов...")
+print("[ESP INITIALIZED] Исправленный скрипт запущен!")
