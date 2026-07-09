@@ -5,7 +5,7 @@ local scripts = {
     'Emotes.lua',
 	'Killer/AutoAttack.lua',
 	'Killer/AutoCarry.lua',
-	'Killer/AutoHook.lua',
+	'Killer/KillerSpeed.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
@@ -66,6 +66,27 @@ Tab:AddToggle({
 	Default = false,
 	Callback = function(Value)
 		_G.AutoHook = Value
+	end    
+})
+
+Tab:AddSlider({
+	Name = "Killer Speed",
+	Min = 0,
+	Max = 20,
+	Default = 5,
+	Color = Color3.fromRGB(255,255,255),
+	Increment = 1,
+	ValueName = "speed",
+	Callback = function(Value)
+		_G.KillerSpeed = Value
+		
+		local character = LocalPlayer.Character
+		if character and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+			local humanoid = character:FindFirstChild("Humanoid")
+			if humanoid then
+				humanoid.WalkSpeed = Value
+			end
+		end
 	end    
 })
 
