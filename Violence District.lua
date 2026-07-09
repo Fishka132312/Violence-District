@@ -1,4 +1,4 @@
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---вфа
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---вфафывфвфвфв
 local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = false, SaveConfig = true, ConfigFolder = "Violence District meowl"})
 
 local scripts = {
@@ -121,6 +121,10 @@ Tab:AddToggle({
 	end    
 })
 
+local Section = Tab:AddSection({
+Name = "Speed"
+})
+
 Tab:AddSlider({
     Name = "Survivor Speed",
     Min = 0,
@@ -135,7 +139,7 @@ Tab:AddSlider({
         local character = LocalPlayer.Character
         if character then
             local humanoid = character:FindFirstChild("Humanoid")
-            if humanoid and _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
+            if humanoid and _G.SurvivorSpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
                 humanoid.WalkSpeed = Value
             end
         end
@@ -143,10 +147,10 @@ Tab:AddSlider({
 })
 
 Tab:AddToggle({
-    Name = "Apply Speed",
+    Name = "Apply Survivor Speed",
     Default = false,
     Callback = function(Value)
-        _G.SpeedToggle = Value
+        _G.SurvivorSpeedToggle = Value
         
         local character = LocalPlayer.Character
         if character then
