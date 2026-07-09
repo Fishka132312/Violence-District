@@ -28,13 +28,7 @@ end
 
 updatePlayerList()
 
-RunService.Heartbeat:Connect(function()
-    if tick() % 5 < 0.05 then
-        updatePlayerList()
-    end
-end)
-
 Players.PlayerAdded:Connect(updatePlayerList)
 Players.PlayerRemoving:Connect(updatePlayerList)
 
-print("=== Player List Updater (без дубликатов) загружен ===")
+print("=== Player List Updater (только по событиям) загружен ===")
