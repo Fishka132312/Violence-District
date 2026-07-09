@@ -1,6 +1,9 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---вфафывфвфвфв
 local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = false, SaveConfig = true, ConfigFolder = "Violence District meowl"})
 
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
 local scripts = {
     'Emotes/Emotes.lua',
 	'Emotes/AnimationSpeed.lua',
