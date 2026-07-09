@@ -1,4 +1,4 @@
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---вфвыфвф
 local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = false, SaveConfig = true, ConfigFolder = "Violence District meowl"})
 
 local scripts = {
@@ -127,12 +127,12 @@ local Section = Tab:AddSection({
 })
 
 local PlayerDropdown = Tab:AddDropdown({
-    Name = "Выбрать игрока",
+    Name = "Choose Player",
     Default = "Загрузка игроков...",
     Options = _G.PlayerList or {"Загрузка..."},
     Callback = function(Value)
         _G.SelectedPlayer = Value
-        print("Выбран: " .. Value)
+        print("Choosed: " .. Value)
     end
 })
 
