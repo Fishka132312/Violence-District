@@ -7,6 +7,8 @@ local CarryEvent = ReplicatedStorage:WaitForChild("Remotes"):WaitForChild("Carry
 
 _G.AutoCarry = false
 
+local KILLER_TEAM_NAME = "Killer"
+
 local function getClosestPlayer()
 	local closestPlayer = nil
 	local shortestDistance = 5
@@ -18,7 +20,7 @@ local function getClosestPlayer()
 	local myPos = LocalPlayer.Character.HumanoidRootPart.Position
 
 	for _, player in ipairs(Players:GetPlayers()) do
-		if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+		if player ~= LocalPlayer and player.Team ~= LocalPlayer.Team and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
 			local targetPos = player.Character.HumanoidRootPart.Position
 			local distance = (myPos - targetPos).Magnitude
 
@@ -39,6 +41,10 @@ end
 
 _G.AutoCarryConnection = RunService.Heartbeat:Connect(function()
 	if not _G.AutoCarry then return end
+	
+	if not LocalPlayer.Team or LocalPlayer.Team.Name ~= KILLER_TEAM_NAME then 
+		return 
+	end
 
 	local targetPlayer = getClosestPlayer()
 	if targetPlayer and targetPlayer.Character then
