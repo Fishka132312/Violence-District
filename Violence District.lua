@@ -1,4 +1,4 @@
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---йййй
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))() ---ццццццц
 local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = false, SaveConfig = true, ConfigFolder = "Violence District meowl"})
 
 local scripts = {
@@ -14,10 +14,6 @@ local scripts = {
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
-
-_G.EmoteList = _G.EmoteList or {}
-_G.SelectedEmote = _G.SelectedEmote or nil
-_G.EmoteLoopActive = _G.EmoteLoopActive or false
 
 for i, scriptName in ipairs(scripts) do
     local fullUrl = baseUrl .. scriptName
@@ -36,10 +32,6 @@ for i, scriptName in ipairs(scripts) do
     end
     
     task.wait(0.5)
-end
-
-if #_G.EmoteList == 0 then
-    _G.EmoteList = {"Эмоции не найдены"}
 end
 
 -------------------------Survivors---------------------------
@@ -260,17 +252,41 @@ local Tab = Window:MakeTab({
 	PremiumOnly = false
 })
 
-Tab:AddDropdown({
+local EmoteDropdown = Tab:AddDropdown({
     Name = "Choose Emote",
     Default = nil,
-    Options = {},
+    Options = {"Загрузка эмоций..."},
     Callback = function(Value)
-        if Value and Value ~= "Эмоции не найдены" then
+        if Value and Value ~= "Эмоции не найдены" and Value ~= "Загрузка эмоций..." then
             _G.SelectedEmote = Value
             print("Выбрана эмоция: " .. Value)
         end
     end
 })
+
+local function RefreshEmoteDropdown()
+    if not EmoteDropdown then return end
+
+    local options = _G.EmoteList or {}
+    
+    if #options == 0 then
+        options = {"Эмоции не найдены"}
+    else
+        local unique = {}
+        for _, name in ipairs(options) do
+            unique[name] = true
+        end
+        options = {}
+        for name in pairs(unique) do
+            table.insert(options, name)
+        end
+        table.sort(options)
+    end
+
+    EmoteDropdown:Refresh(options)
+end
+
+task.delay(1, RefreshEmoteDropdown)
 
 Tab:AddToggle({
 	Name = "Start Emote",
