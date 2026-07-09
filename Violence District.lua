@@ -132,14 +132,14 @@ Tab:AddButton({
     Name = "Add / Remove Whitelist",
     Callback = function()
         local selected = _G.SelectedPlayer
-      
+     
         if not selected or selected == "Загрузка игроков..." or selected == "Нет игроков" then
             print("❌ Choose Player")
             return
         end
-        
+       
         local index = table.find(_G.Whitelist, selected)
-      
+     
         if index then
             table.remove(_G.Whitelist, index)
             print("➖ " .. selected .. " removed from whitelist")
@@ -152,45 +152,51 @@ Tab:AddButton({
 
 local LastPlayerHash = ""
 
+local function UpdatePlayerDropdown()
+    if not PlayerDropdown or typeof(PlayerDropdown.Refresh) ~= "function" then
+        return
+    end
+
+    local options = _G.PlayerList or {}
+    
+    if #options == 0 then
+        options = {"Нет игроков"}
+    else
+        local unique = {}
+        for _, name in ipairs(options) do
+            unique[name] = true
+        end
+        options = {}
+        for name in pairs(unique) do
+            table.insert(options, name)
+        end
+        table.sort(options)
+    end
+
+    local currentHash = table.concat(options, ",")
+    if currentHash == LastPlayerHash then
+        return
+    end
+
+    LastPlayerHash = currentHash
+    PlayerDropdown:Refresh(options)
+
+    if _G.SelectedPlayer and table.find(options, _G.SelectedPlayer) then
+        PlayerDropdown:Set(_G.SelectedPlayer)
+    end
+end
+
 task.spawn(function()
     while true do
-        task.wait(3)
-        
-        if not PlayerDropdown or typeof(PlayerDropdown.Refresh) ~= "function" then
-            continue
-        end
-
-        local options = _G.PlayerList or {}
-        
-        if #options == 0 then
-            options = {"Нет игроков"}
-        else
-            local unique = {}
-            for _, name in ipairs(options) do
-                unique[name] = true
-            end
-            
-            options = {}
-            for name in pairs(unique) do
-                table.insert(options, name)
-            end
-            table.sort(options)
-        end
-
-        local currentHash = table.concat(options, ",")
-        if currentHash == LastPlayerHash then
-            continue
-        end
-        
-        LastPlayerHash = currentHash
-
-        PlayerDropdown:Refresh(options)
-
-        if _G.SelectedPlayer and table.find(options, _G.SelectedPlayer) then
-            PlayerDropdown:Set(_G.SelectedPlayer)
-        end
+        task.wait(2.5)
+        UpdatePlayerDropdown()
     end
 end)
+
+Players.PlayerAdded:Connect(UpdatePlayerDropdown)
+Players.PlayerRemoving:Connect(UpdatePlayerDropdown)
+
+task.delay(1, UpdatePlayerDropdown)
 
 Tab:AddToggle({
 	Name = "Auto Attack",
