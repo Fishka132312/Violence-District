@@ -7,6 +7,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
 
+-- Дефолтные значения
 if _G.EspKiller == nil then _G.EspKiller = false end
 if _G.EspSurvivors == nil then _G.EspSurvivors = false end
 if _G.EspSpectator == nil then _G.EspSpectator = false end
@@ -31,26 +32,33 @@ end
 local function createESP(player, character)
     if player == LocalPlayer then return end
     
-    local rootPart = character:WaitForChild("HumanoidRootPart", 3)
-    local humanoid = character:WaitForChild("Humanoid", 3)
-    if not rootPart or not humanoid or humanoid.Health <= 0 then 
-        removeESP(player)
-        return 
-    end
-
     local team = player.Team
     local teamName = team and team.Name or "NoTeam"
-    local teamColor = player.TeamColor and player.TeamColor.Color or Color3.fromRGB(255, 255, 255)
-
+    
+    -- ОПТИМИЗАЦИЯ 1: Если ESP для этой команды ВЫКЛЮЧЕН, 
+    -- мы просто сразу удаляем подсветку (если она была) и уходим, НЕ вызывая WaitForChild
     if not isEspEnabledForTeam(teamName) then
         removeESP(player)
         return
     end
 
+    -- ОПТИМИЗАЦИЯ 2: Вместо медленного WaitForChild каждый кадр, используем FindFirstChild.
+    -- Если персонаж только загружается, он просто пропустит пару кадров, пока части не появятся.
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    
+    if not rootPart or not humanoid or humanoid.Health <= 0 then 
+        removeESP(player)
+        return 
+    end
+
+    local teamColor = player.TeamColor and player.TeamColor.Color or Color3.fromRGB(255, 255, 255)
+
     if not activeVisuals[player] then
         activeVisuals[player] = {}
     end
 
+    -- Создание/обновление Highlight
     local highlight = activeVisuals[player].Highlight
     if not highlight or highlight.Parent ~= character then
         if highlight then highlight:Destroy() end
@@ -65,6 +73,7 @@ local function createESP(player, character)
     highlight.FillColor = teamColor
     highlight.OutlineColor = teamColor
 
+    -- Создание/обновление BillboardGui
     local billboard = activeVisuals[player].Billboard
     if not billboard or billboard.Parent ~= rootPart then
         if billboard then billboard:Destroy() end
@@ -87,7 +96,12 @@ local function createESP(player, character)
         activeVisuals[player].Billboard = billboard
     end
 
-    local distance = math.floor((LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") and (LocalPlayer.Character.HumanoidRootPart.Position - rootPart.Position).Magnitude) or 0)
+    -- Считаем дистанцию
+    local localRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    local distance = 0
+    if localRoot then
+        distance = math.floor((localRoot.Position - rootPart.Position).Magnitude)
+    end
     
     local label = billboard:FindFirstChild("ESPLabel")
     if label then
@@ -101,7 +115,8 @@ connection = RunService.RenderStepped:Connect(function()
     for _, player in ipairs(Players:GetPlayers()) do
         local character = player.Character
         if character then
-            createESP(player, character)
+            -- Используем pcall, чтобы если даже произойдет редкий баг (например игрок резко вышел), скрипт не падал
+            pcall(createESP, player, character)
         else
             removeESP(player)
         end
@@ -117,5 +132,4 @@ local function cleanup()
 end
 
 _G[SCRIPT_TAG] = cleanup
-
 print("on")
