@@ -13,37 +13,33 @@ if _G.HooksEsp == nil then _G.HooksEsp = false end
 
 local activeHookVisuals = {}
 
-local function getHooksFolder()
-    local map = workspace:FindFirstChild("Map")
-    if map then
-        return map:FindFirstChild("Hooks")
-    end
-    return nil
+local function getMapFolder()
+    return workspace:FindFirstChild("Map")
 end
 
-local function removeHookESP(hookModel)
-    if activeHookVisuals[hookModel] then
-        if activeHookVisuals[hookModel].Highlight then activeHookVisuals[hookModel].Highlight:Destroy() end
-        if activeHookVisuals[hookModel].Billboard then activeHookVisuals[hookModel].Billboard:Destroy() end
-        activeHookVisuals[hookModel] = nil
+local function removeHookESP(hookTarget)
+    if activeHookVisuals[hookTarget] then
+        if activeHookVisuals[hookTarget].Highlight then activeHookVisuals[hookTarget].Highlight:Destroy() end
+        if activeHookVisuals[hookTarget].Billboard then activeHookVisuals[hookTarget].Billboard:Destroy() end
+        activeHookVisuals[hookTarget] = nil
     end
 end
 
-local function createHookESP(hookModel)
+local function createHookESP(hookTarget)
     if not _G.HooksEsp then
-        removeHookESP(hookModel)
+        removeHookESP(hookTarget)
         return
     end
 
-    local rootPart = hookModel.PrimaryPart or hookModel:FindFirstChildWhichIsA("BasePart")
+    local rootPart = hookTarget:IsA("Model") and (hookTarget.PrimaryPart or hookTarget:FindFirstChildWhichIsA("BasePart")) or hookTarget
     if not rootPart then return end
 
-    if not activeHookVisuals[hookModel] then
-        activeHookVisuals[hookModel] = {}
+    if not activeHookVisuals[hookTarget] then
+        activeHookVisuals[hookTarget] = {}
     end
 
-    local highlight = activeHookVisuals[hookModel].Highlight
-    if not highlight or highlight.Parent ~= hookModel then
+    local highlight = activeHookVisuals[hookTarget].Highlight
+    if not highlight or highlight.Parent ~= hookTarget then
         if highlight then highlight:Destroy() end
         highlight = Instance.new("Highlight")
         highlight.Name = "HookHighlight"
@@ -52,11 +48,11 @@ local function createHookESP(hookModel)
         highlight.OutlineTransparency = 0
         highlight.FillColor = HOOK_COLOR
         highlight.OutlineColor = HOOK_COLOR
-        highlight.Parent = hookModel
-        activeHookVisuals[hookModel].Highlight = highlight
+        highlight.Parent = hookTarget
+        activeHookVisuals[hookTarget].Highlight = highlight
     end
 
-    local billboard = activeHookVisuals[hookModel].Billboard
+    local billboard = activeHookVisuals[hookTarget].Billboard
     if not billboard or billboard.Parent ~= rootPart then
         if billboard then billboard:Destroy() end
         billboard = Instance.new("BillboardGui")
@@ -76,7 +72,7 @@ local function createHookESP(hookModel)
         label.Parent = billboard
         
         billboard.Parent = rootPart
-        activeHookVisuals[hookModel].Billboard = billboard
+        activeHookVisuals[hookTarget].Billboard = billboard
     end
 
     local localRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -93,28 +89,34 @@ end
 
 local connection
 connection = RunService.RenderStepped:Connect(function()
-    local hookFolder = getHooksFolder()
+    local mapFolder = getMapFolder()
     
-    if hookFolder and _G.HooksEsp then
-        for _, hook in ipairs(hookFolder:GetChildren()) do
-            if hook:IsA("Model") then
-                createHookESP(hook)
+    if mapFolder and _G.HooksEsp then
+        for _, obj in ipairs(mapFolder:GetDescendants()) do
+            if obj.Name == "Hook" and (obj:IsA("Model") or obj:IsA("BasePart")) then
+                createHookESP(obj)
+            end
+        end
+        
+        for hookTarget, _ in pairs(activeHookVisuals) do
+            if not hookTarget or not hookTarget:IsDescendantOf(mapFolder) then
+                removeHookESP(hookTarget)
             end
         end
     else
-        for hookModel, _ in pairs(activeHookVisuals) do
-            removeHookESP(hookModel)
+        for hookTarget, _ in pairs(activeHookVisuals) do
+            removeHookESP(hookTarget)
         end
     end
 end)
 
 local function cleanup()
     if connection then connection:Disconnect() end
-    for hookModel, _ in pairs(activeHookVisuals) do
-        removeHookESP(hookModel)
+    for hookTarget, _ in pairs(activeHookVisuals) do
+        removeHookESP(hookTarget)
     end
     print("Hook ESP cleared")
 end
 
 _G[SCRIPT_TAG] = cleanup
-print("[HOOK ESP INITIALIZED] Скрипт крюков запущен!")
+print("[HOOK ESP INITIALIZED] Скрипт крюков (поиск в Map) запущен!")
