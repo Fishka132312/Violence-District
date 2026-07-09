@@ -16,6 +16,7 @@ for _, emote in ipairs(EmotesFolder:GetChildren()) do
         table.insert(_G.EmoteList, emote.Name)
     end
 end
+
 table.sort(_G.EmoteList)
 
 print("[Emote Core] Скрипт загружен. Найдено эмоций: " .. #_G.EmoteList)
@@ -29,54 +30,20 @@ end
 
 task.spawn(function()
     while _G.EmoteScriptID == currentSessionID do
-        if _G.EmoteLoopActive and (_G.EmoteLoopActive ~= lastState or _G.SelectedEmote ~= lastEmote) then
-            playEmote()
-            lastEmote = _G.SelectedEmote
-            lastState = _G.EmoteLoopActive
-        elseif not _G.EmoteLoopActive and lastState then
-            lastState = false
-            lastEmote = nil
-        end
-        task.wait(0.05)
-    end
-end)
-
-local EmoteDropdown = Tab:AddDropdown({
-    Name = "Choose Emote",
-    Default = nil,
-    Options = {"Загрузка эмоций..."},
-    Callback = function(Value)
-        if Value and Value ~= "Эмоции не найдены" then
-            _G.SelectedEmote = Value
-            print("Выбрана эмоция: " .. Value)
-        end
-    end
-})
-
-local function RefreshEmoteDropdown()
-    local options = _G.EmoteList or {}
-    
-    if #options == 0 then
-        options = {"Эмоции не найдены"}
-    else
-        local clean = {}
-        for _, name in ipairs(options) do
-            if name and name ~= "" then
-                table.insert(clean, name)
+        if _G.EmoteLoopActive then
+            if _G.SelectedEmote and (_G.SelectedEmote ~= lastEmote or _G.EmoteLoopActive ~= lastState) then
+                playEmote()
+                lastEmote = _G.SelectedEmote
+                lastState = _G.EmoteLoopActive
+            end
+        else
+            if lastState then
+                lastState = false
+                lastEmote = nil
             end
         end
-        table.sort(clean)
-        options = clean
-    end
-
-    if EmoteDropdown and typeof(EmoteDropdown.Refresh) == "function" then
-        EmoteDropdown:Refresh(options)
         
-        if _G.SelectedEmote and table.find(options, _G.SelectedEmote) then
-            EmoteDropdown:Set(_G.SelectedEmote)
-        end
+        task.wait(0.05)
     end
-end
-
-task.wait(0.5)
-RefreshEmoteDropdown()
+    print("[Emote Core] Скрипт остановлен.")
+end)
