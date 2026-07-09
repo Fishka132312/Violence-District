@@ -1,49 +1,67 @@
-local EmotesFolder = game:GetService("ReplicatedStorage"):WaitForChild("Emotes")
-local EmoteRemote = game:GetService("ReplicatedStorage"):WaitForChild("Remotes"):WaitForChild("EmoteHandler")
+-- EmoteLoader (LocalScript)
 
-_G.EmoteScriptID = os.clock()
-local currentSessionID = _G.EmoteScriptID
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
 
-_G.EmoteList = {}
-_G.SelectedEmote = nil
-_G.EmoteLoopActive = false
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
 
-local lastEmote = nil
-local lastState = false
+local emotesFolder = ReplicatedStorage:WaitForChild("Emotes")
 
-for _, emote in ipairs(EmotesFolder:GetChildren()) do
-    if emote:IsA("Folder") or emote:IsA("Configuration") or emote:IsA("StringValue") then
-        table.insert(_G.EmoteList, emote.Name)
+local currentTrack = nil
+local currentEmoteName = nil
+
+local function playEmote(emoteName)
+    if currentTrack then
+        currentTrack:Stop()
+        currentTrack = nil
+    end
+
+    local emoteFolder = emotesFolder:FindFirstChild(emoteName)
+    if not emoteFolder then
+        warn("Emote not found:", emoteName)
+        return false
+    end
+
+    local animId = emoteFolder:GetAttribute("AnimationId")
+    if not animId then
+        warn("AnimationId attribute not found in:", emoteName)
+        return false
+    end
+
+    local animation = Instance.new("Animation")
+    animation.AnimationId = animId
+
+    currentTrack = humanoid:LoadAnimation(animation)
+    currentTrack.Priority = Enum.AnimationPriority.Action
+    currentTrack:Play()
+
+    currentEmoteName = emoteName
+    print("Playing emote:", emoteName, "ID:", animId)
+    return true
+end
+
+local function stopEmote()
+    if currentTrack then
+        currentTrack:Stop()
+        currentTrack = nil
+        currentEmoteName = nil
+        print("Emote stopped")
     end
 end
 
-table.sort(_G.EmoteList)
-
-print("[Emote Core] Скрипт загружен. Найдено эмоций: " .. #_G.EmoteList)
-
-local function playEmote()
-    if _G.SelectedEmote and _G.SelectedEmote ~= "" and _G.SelectedEmote ~= "Эмоции не найдены" then
-        local args = { _G.SelectedEmote }
-        EmoteRemote:FireServer(unpack(args))
-    end
-end
-
-task.spawn(function()
-    while _G.EmoteScriptID == currentSessionID do
-        if _G.EmoteLoopActive then
-            if _G.SelectedEmote and (_G.SelectedEmote ~= lastEmote or _G.EmoteLoopActive ~= lastState) then
-                playEmote()
-                lastEmote = _G.SelectedEmote
-                lastState = _G.EmoteLoopActive
-            end
-        else
-            if lastState then
-                lastState = false
-                lastEmote = nil
-            end
+getgenv().PlayEmoteByName = playEmote
+getgenv().StopCurrentEmote = stopEmote
+getgenv().GetAllEmotes = function()
+    local list = {}
+    for _, folder in ipairs(emotesFolder:GetChildren()) do
+        if folder:IsA("Folder") then
+            table.insert(list, folder.Name)
         end
-        
-        task.wait(0.05)
     end
-    print("[Emote Core] Скрипт остановлен.")
-end)
+    table.sort(list)
+    return list
+end
+
+print("Emote Loader loaded successfully!")
