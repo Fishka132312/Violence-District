@@ -4,6 +4,7 @@ local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = fa
 local scripts = {
     'Emotes.lua',
 	'Killer/AutoAttack.lua',
+	'Killer/AutoCarry.lua',
 	'Killer/AutoHook.lua',
 }
 
@@ -49,6 +50,14 @@ Tab:AddToggle({
 	Default = false,
 	Callback = function(Value)
 		_G.AutoAttackKiller = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Auto Carry",
+	Default = false,
+	Callback = function(Value)
+		_G.AutoCarry = Value
 	end    
 })
 
