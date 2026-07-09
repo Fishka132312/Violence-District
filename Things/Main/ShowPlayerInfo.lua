@@ -1,14 +1,16 @@
-local Players = game:GetService("Players")
+local Players = game:GetService("Players") --66534535
 local LocalPlayer = Players.LocalPlayer
+
+local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
 
 LocalPlayer:GetAttributeChangedSignal("RequestPlayerInfo"):Connect(function()
     local targetName = LocalPlayer:GetAttribute("RequestPlayerInfo")
     if not targetName then return end
-
+    
     local target = Players:FindFirstChild(targetName)
-    if not target then 
+    if not target then
         LocalPlayer:SetAttribute("RequestPlayerInfo", nil)
-        return 
+        return
     end
 
     local info = {
