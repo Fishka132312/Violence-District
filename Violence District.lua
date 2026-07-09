@@ -3,7 +3,8 @@ local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = fa
 
 local scripts = {
     'Emotes.lua',
-	'Killer/AutoAtack.lua',
+	'Killer/AutoAttack.lua',
+	'Killer/AutoHook.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
@@ -44,10 +45,18 @@ local Tab = Window:MakeTab({
 })
 
 Tab:AddToggle({
-	Name = "Auto Atack",
+	Name = "Auto Attack",
 	Default = false,
 	Callback = function(Value)
 		_G.AutoAttackKiller = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Auto Hook",
+	Default = false,
+	Callback = function(Value)
+		_G.AutoHook = Value
 	end    
 })
 
