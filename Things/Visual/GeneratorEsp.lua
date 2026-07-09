@@ -8,41 +8,38 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 local GEN_COLOR = Color3.fromRGB(255, 0, 0)
+
 if _G.EspGenerators == nil then _G.EspGenerators = false end
 
 local activeGenVisuals = {}
 
-local function getGeneratorsFolder()
-    local map = workspace:FindFirstChild("Map")
-    if map then
-        return map:FindFirstChild("Generators")
-    end
-    return nil
+local function getMapFolder()
+    return workspace:FindFirstChild("Map")
 end
 
-local function removeGenESP(genModel)
-    if activeGenVisuals[genModel] then
-        if activeGenVisuals[genModel].Highlight then activeGenVisuals[genModel].Highlight:Destroy() end
-        if activeGenVisuals[genModel].Billboard then activeGenVisuals[genModel].Billboard:Destroy() end
-        activeGenVisuals[genModel] = nil
+local function removeGenESP(genTarget)
+    if activeGenVisuals[genTarget] then
+        if activeGenVisuals[genTarget].Highlight then activeGenVisuals[genTarget].Highlight:Destroy() end
+        if activeGenVisuals[genTarget].Billboard then activeGenVisuals[genTarget].Billboard:Destroy() end
+        activeGenVisuals[genTarget] = nil
     end
 end
 
-local function createGenESP(genModel)
+local function createGenESP(genTarget)
     if not _G.EspGenerators then
-        removeGenESP(genModel)
+        removeGenESP(genTarget)
         return
     end
 
-    local rootPart = genModel.PrimaryPart or genModel:FindFirstChildWhichIsA("BasePart")
+    local rootPart = genTarget:IsA("Model") and (genTarget.PrimaryPart or genTarget:FindFirstChildWhichIsA("BasePart")) or genTarget
     if not rootPart then return end
 
-    if not activeGenVisuals[genModel] then
-        activeGenVisuals[genModel] = {}
+    if not activeGenVisuals[genTarget] then
+        activeGenVisuals[genTarget] = {}
     end
 
-    local highlight = activeGenVisuals[genModel].Highlight
-    if not highlight or highlight.Parent ~= genModel then
+    local highlight = activeGenVisuals[genTarget].Highlight
+    if not highlight or highlight.Parent ~= genTarget then
         if highlight then highlight:Destroy() end
         highlight = Instance.new("Highlight")
         highlight.Name = "GenHighlight"
@@ -51,11 +48,11 @@ local function createGenESP(genModel)
         highlight.OutlineTransparency = 0
         highlight.FillColor = GEN_COLOR
         highlight.OutlineColor = GEN_COLOR
-        highlight.Parent = genModel
-        activeGenVisuals[genModel].Highlight = highlight
+        highlight.Parent = genTarget
+        activeGenVisuals[genTarget].Highlight = highlight
     end
 
-    local billboard = activeGenVisuals[genModel].Billboard
+    local billboard = activeGenVisuals[genTarget].Billboard
     if not billboard or billboard.Parent ~= rootPart then
         if billboard then billboard:Destroy() end
         billboard = Instance.new("BillboardGui")
@@ -75,7 +72,7 @@ local function createGenESP(genModel)
         label.Parent = billboard
         
         billboard.Parent = rootPart
-        activeGenVisuals[genModel].Billboard = billboard
+        activeVisuals = activeGenVisuals[genTarget].Billboard = billboard
     end
 
     local localRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
@@ -92,28 +89,34 @@ end
 
 local connection
 connection = RunService.RenderStepped:Connect(function()
-    local genFolder = getGeneratorsFolder()
+    local mapFolder = getMapFolder()
     
-    if genFolder and _G.EspGenerators then
-        for _, gen in ipairs(genFolder:GetChildren()) do
-            if gen:IsA("Model") then
-                createGenESP(gen)
+    if mapFolder and _G.EspGenerators then
+        for _, obj in ipairs(mapFolder:GetDescendants()) do
+            if obj.Name == "Generator" and (obj:IsA("Model") or obj:IsA("BasePart")) then
+                createGenESP(obj)
+            end
+        end
+        
+        for genTarget, _ in pairs(activeGenVisuals) do
+            if not genTarget or not genTarget:IsDescendantOf(mapFolder) then
+                removeGenESP(genTarget)
             end
         end
     else
-        for genModel, _ in pairs(activeGenVisuals) do
-            removeGenESP(genModel)
+        for genTarget, _ in pairs(activeGenVisuals) do
+            removeGenESP(genTarget)
         end
     end
 end)
 
 local function cleanup()
     if connection then connection:Disconnect() end
-    for genModel, _ in pairs(activeGenVisuals) do
-        removeGenESP(genModel)
+    for genTarget, _ in pairs(activeGenVisuals) do
+        removeGenESP(genTarget)
     end
     print("Generator ESP cleared")
 end
 
 _G[SCRIPT_TAG] = cleanup
-print("[GEN ESP INITIALIZED] Скрипт генераторов запущен!")
+print("[GEN ESP INITIALIZED] Скрипт генераторов (поиск в Map) запущен!")
