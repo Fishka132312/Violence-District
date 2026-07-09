@@ -10,6 +10,7 @@ local scripts = {
 	'Visual/GeneratorEsp.lua',
 	'Visual/HooksEsp.lua',
 	'Survivors/BypassGates.lua',
+	'Whitelist.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
