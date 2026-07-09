@@ -18,6 +18,7 @@ local scripts = {
 	'Survivors/SurvivorSpeed.lua',
 	'Survivors/AutoSkillCheck.lua',
 	'Whitelist.lua',
+	'Main/ShowPlayerInfo.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
@@ -52,7 +53,7 @@ local Tab = Window:MakeTab({
 local selectedPlayerName = nil
 
 local PlayerInfoDropdown = Tab:AddDropdown({
-    Name = "Choose Player",
+    Name = "Выбери игрока",
     Default = "",
     Options = {},
     Callback = function(Value)
@@ -61,14 +62,14 @@ local PlayerInfoDropdown = Tab:AddDropdown({
 })
 
 Tab:AddButton({
-    Name = "Show Player Info",
+    Name = "Показать информацию",
     Callback = function()
         if not selectedPlayerName or selectedPlayerName == "" then
             OrionLib:MakeNotification({
-                Name = "Ошибка!",
-                Content = "Сначала выбери игрока в дропдауне.",
+                Name = "Ошибка",
+                Content = "Сначала выбери игрока!",
                 Image = "rbxassetid://4483345998",
-                Time = 4
+                Time = 3
             })
             return
         end
@@ -76,44 +77,21 @@ Tab:AddButton({
         local target = Players:FindFirstChild(selectedPlayerName)
         if not target then
             OrionLib:MakeNotification({
-                Name = "Ошибка!",
-                Content = "Игрок не найден.",
+                Name = "Ошибка",
+                Content = "Игрок не найден!",
                 Image = "rbxassetid://4483345998",
-                Time = 4
+                Time = 3
             })
             return
         end
 
-        local info = {
-            AllowKiller = target:GetAttribute("AllowKiller") or false,
-            EXP = target:GetAttribute("EXP") or 0,
-            Level = target:GetAttribute("Level") or 1,
-            Platform = target:GetAttribute("platform") or "Unknown",
-            Screws = target:GetAttribute("Screws") or 0,
-            SelectedKiller = target:GetAttribute("SelectedKiller") or "None",
-            Gears = target:GetAttribute("Gears") or 0,
-        }
-
-        local message = string.format(
-            "👤 Игрок: %s\n\n"..
-            "AllowKiller: %s\n"..
-            "EXP: %d | Level: %d\n"..
-            "Platform: %s\n"..
-            "Screws: %d | Gears: %d\n"..
-            "SelectedKiller: %s",
-            target.Name,
-            tostring(info.AllowKiller),
-            info.EXP, info.Level,
-            info.Platform,
-            info.Screws, info.Gears,
-            info.SelectedKiller
-        )
+        LocalPlayer:SetAttribute("RequestPlayerInfo", selectedPlayerName)
 
         OrionLib:MakeNotification({
-            Name = "Информация об игроке",
-            Content = message,
+            Name = "Запрос отправлен",
+            Content = "Информация о " .. selectedPlayerName .. " запрошена...",
             Image = "rbxassetid://4483345998",
-            Time = 8
+            Time = 4
         })
     end    
 })
@@ -128,35 +106,16 @@ Tab:AddButton({
             end
         end
         table.sort(options)
-        if #options == 0 then
-            options = {"Нет других игроков"}
-        end
+        if #options == 0 then options = {"Нет игроков"} end
         PlayerInfoDropdown:Refresh(options)
-        
-        OrionLib:MakeNotification({
-            Name = "Updated",
-            Content = "Dropdown с игроками обновлён.",
-            Image = "rbxassetid://4483345998",
-            Time = 3
-        })
     end    
 })
-
-Players.PlayerAdded:Connect(function()
-    task.wait(0.5)
-end)
-
-Players.PlayerRemoving:Connect(function()
-    task.wait(0.5)
-end)
 
 task.spawn(function()
     task.wait(1)
     local options = {}
     for _, plr in ipairs(Players:GetPlayers()) do
-        if plr ~= LocalPlayer then
-            table.insert(options, plr.Name)
-        end
+        if plr ~= LocalPlayer then table.insert(options, plr.Name) end
     end
     table.sort(options)
     PlayerInfoDropdown:Refresh(options)
