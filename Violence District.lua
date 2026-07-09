@@ -50,10 +50,14 @@ local Tab = Window:MakeTab({
     PremiumOnly = false
 })
 
+local Section = Tab:AddSection({
+	Name = "Show Player Info"
+})
+
 local selectedPlayerName = nil
 
 local PlayerInfoDropdown = Tab:AddDropdown({
-    Name = "Выбери игрока",
+    Name = "Choose Player",
     Default = "",
     Options = {},
     Callback = function(Value)
@@ -62,12 +66,12 @@ local PlayerInfoDropdown = Tab:AddDropdown({
 })
 
 Tab:AddButton({
-    Name = "Показать информацию",
+    Name = "Show Info",
     Callback = function()
         if not selectedPlayerName or selectedPlayerName == "" then
             OrionLib:MakeNotification({
-                Name = "Ошибка",
-                Content = "Сначала выбери игрока!",
+                Name = "Error",
+                Content = "Choose Player First!",
                 Image = "rbxassetid://4483345998",
                 Time = 3
             })
@@ -77,8 +81,8 @@ Tab:AddButton({
         local target = Players:FindFirstChild(selectedPlayerName)
         if not target then
             OrionLib:MakeNotification({
-                Name = "Ошибка",
-                Content = "Игрок не найден!",
+                Name = "Error",
+                Content = "Player not Found!",
                 Image = "rbxassetid://4483345998",
                 Time = 3
             })
@@ -88,8 +92,8 @@ Tab:AddButton({
         LocalPlayer:SetAttribute("RequestPlayerInfo", selectedPlayerName)
 
         OrionLib:MakeNotification({
-            Name = "Запрос отправлен",
-            Content = "Информация о " .. selectedPlayerName .. " запрошена...",
+            Name = "Send request",
+            Content = "Information " .. selectedPlayerName .. " send...",
             Image = "rbxassetid://4483345998",
             Time = 4
         })
@@ -97,7 +101,7 @@ Tab:AddButton({
 })
 
 Tab:AddButton({
-    Name = "🔄 Обновить список игроков",
+    Name = "🔄 Refresh List",
     Callback = function()
         local options = {}
         for _, plr in ipairs(Players:GetPlayers()) do
@@ -106,7 +110,7 @@ Tab:AddButton({
             end
         end
         table.sort(options)
-        if #options == 0 then options = {"Нет игроков"} end
+        if #options == 0 then options = {"No Players"} end
         PlayerInfoDropdown:Refresh(options)
     end    
 })
