@@ -19,6 +19,7 @@ local scripts = {
 	'Survivors/AutoSkillCheck.lua',
 	'Whitelist.lua',
 	'Main/ShowPlayerInfo.lua',
+	'Main/Fullbright.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
@@ -122,6 +123,17 @@ task.spawn(function()
     PlayerInfoDropdown:Refresh(options)
 end)
 
+local Section = Tab:AddSection({
+    Name = "Lightning"
+})
+
+Tab:AddToggle({
+	Name = "Fullbright",
+	Default = false,
+	Callback = function(Value)
+		_G.Fullbridthlol = Value
+	end    
+})
 
 -------------------------Visual---------------------------
 
