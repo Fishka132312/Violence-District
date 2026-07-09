@@ -121,6 +121,63 @@ local Tab = Window:MakeTab({
 	PremiumOnly = false
 })
 
+local Section = Tab:AddSection({
+    Name = "Whitelist Manager"
+})
+
+local PlayerDropdown = Tab:AddDropdown({
+    Name = "Выбрать игрока",
+    Default = "Загрузка игроков...",
+    Options = _G.PlayerList or {"Загрузка..."},
+    Callback = function(Value)
+        _G.SelectedPlayer = Value
+        print("Выбран: " .. Value)
+    end
+})
+
+Tab:AddButton({
+    Name = "➕ Добавить в Whitelist",
+    Callback = function()
+        local selected = _G.SelectedPlayer
+        if selected and selected ~= "Загрузка игроков..." and selected ~= "Нет игроков" then
+            if not table.find(_G.Whitelist, selected) then
+                table.insert(_G.Whitelist, selected)
+                print("✅ " .. selected .. " добавлен в whitelist")
+            else
+                print("⚠️ " .. selected .. " уже в whitelist")
+            end
+        else
+            print("❌ Выбери игрока")
+        end
+    end
+})
+
+Tab:AddButton({
+    Name = "Показать Whitelist",
+    Callback = function()
+        if #_G.Whitelist == 0 then
+            print("Whitelist пуст")
+            return
+        end
+        print("=== WHITELIST (" .. #_G.Whitelist .. " игроков) ===")
+        for _, name in ipairs(_G.Whitelist) do
+            print(" - " .. name)
+        end
+    end
+})
+
+task.spawn(function()
+    while task.wait(5) do
+        if PlayerDropdown and typeof(PlayerDropdown.Refresh) == "function" then
+            local options = _G.PlayerList
+            if #options == 0 then
+                options = {"Нет игроков"}
+            end
+            PlayerDropdown:Refresh(options)
+        end
+    end
+end)
+
 Tab:AddToggle({
 	Name = "Auto Attack",
 	Default = false,
