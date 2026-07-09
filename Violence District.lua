@@ -1,28 +1,6 @@
 local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/jensonhirst/Orion/main/source')))()
 local Window = OrionLib:MakeWindow({Name = "Violence District", HidePremium = false, SaveConfig = true, ConfigFolder = "Violence District meowl"})
 
--- === ИНИЦИАЛИЗАЦИЯ ВАЙТЛИСТА ===
--- Делаем это ДО загрузки скриптов, чтобы AutoAttack.lua сразу видел таблицу
-_G.WhitelistSystem = _G.WhitelistSystem or {}
-_G.WhitelistSystem.List = _G.WhitelistSystem.List or {}
-
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
--- Функция для получения ников (нужна для дропдауна)
-local function getPlayerNamesList()
-	local names = {}
-	for _, p in ipairs(Players:GetPlayers()) do
-		if p ~= LocalPlayer then
-			local isWL = _G.WhitelistSystem.List[p.UserId] == true
-			local prefix = isWL and "[WL] " or ""
-			table.insert(names, prefix .. p.Name)
-		end
-	end
-	return names
-end
-
--- === ЗАГРУЗКА СКРИПТОВ ===
 local scripts = {
     'Emotes.lua',
 	'Killer/AutoAttack.lua',
@@ -142,41 +120,6 @@ local Tab = Window:MakeTab({
 	Icon = "rbxassetid://4483345998",
 	PremiumOnly = false
 })
-
-local WhitelistDropdown
-
-WhitelistDropdown = KillerTab:AddDropdown({
-	Name = "Whitelist",
-	Default = "Choose Player",
-	Options = getPlayerNamesList(),
-	Callback = function(Value)
-		local cleanName = Value:gsub("%[WL%] ", "")
-		local targetPlayer = Players:FindFirstChild(cleanName)
-		
-		if targetPlayer then
-			if _G.WhitelistSystem.List[targetPlayer.UserId] then
-				_G.WhitelistSystem.List[targetPlayer.UserId] = nil
-				print("[WL] Удален:", targetPlayer.Name)
-			else
-				_G.WhitelistSystem.List[targetPlayer.UserId] = true
-				print("[WL] Добавлен:", targetPlayer.Name)
-			end
-			
-			if WhitelistDropdown then
-				WhitelistDropdown:Refresh(getPlayerNamesList(), true)
-			end
-		end
-	end    
-})
-
-Players.PlayerAdded:Connect(function()
-	if WhitelistDropdown then WhitelistDropdown:Refresh(getPlayerNamesList(), true) end
-end)
-
-Players.PlayerRemoving:Connect(function(player)
-	_G.WhitelistSystem.List[player.UserId] = nil
-	if WhitelistDropdown then WhitelistDropdown:Refresh(getPlayerNamesList(), true) end
-end)
 
 Tab:AddToggle({
 	Name = "Auto Attack",
