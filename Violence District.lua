@@ -261,15 +261,15 @@ local Tab = Window:MakeTab({
 })
 
 Tab:AddDropdown({
-	Name = "Choose Emote",
-	Default = _G.EmoteList[1], 
-	Options = _G.EmoteList, 
-	Callback = function(Value)
-		if Value ~= "Эмоции не найдены" then
-			_G.SelectedEmote = Value
-			print("Выбрана эмоция: " .. tostring(_G.SelectedEmote))
-		end
-	end    
+    Name = "Choose Emote",
+    Default = nil,
+    Options = {},
+    Callback = function(Value)
+        if Value and Value ~= "Эмоции не найдены" then
+            _G.SelectedEmote = Value
+            print("Выбрана эмоция: " .. Value)
+        end
+    end
 })
 
 Tab:AddToggle({
