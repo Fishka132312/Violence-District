@@ -312,11 +312,8 @@ Tab:AddSlider({
         _G.KillerSpeed = Value
         
         local char = LocalPlayer.Character
-        if char then
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            if hum and _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
-                hum.WalkSpeed = Value
-            end
+        if char and _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+            char:SetAttribute("speedboost", Value)
         end
     end
 })
@@ -328,15 +325,12 @@ Tab:AddToggle({
         _G.SpeedToggle = Value
         
         local char = LocalPlayer.Character
-        if char then
-            local hum = char:FindFirstChildOfClass("Humanoid")
-            if hum then
-                if Value and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
-                    hum.WalkSpeed = _G.KillerSpeed
-                else
-                    hum.WalkSpeed = 16
-                end
-            end
+        if not char then return end
+        
+        if Value and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+            char:SetAttribute("speedboost", _G.KillerSpeed)
+        else
+            char:SetAttribute("speedboost", 0)
         end
     end
 })
