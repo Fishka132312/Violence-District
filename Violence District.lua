@@ -21,6 +21,7 @@ local scripts = {
 	'Survivors/AutoSkillCheck.lua',
 	'Survivors/DisCollision.lua',
 	'Survivors/AntiAura.lua',
+	'Survivora/PANICTP.lua',
 	'Whitelist.lua',
 	'Main/ShowPlayerInfo.lua',
 	'Main/Fullbright.lua',
@@ -495,6 +496,14 @@ Tab:AddToggle({
 	Default = false,
 	Callback = function(Value)
 		_G.AntiAura = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "PanicTp",
+	Default = false,
+	Callback = function(Value)
+		_G.PANICTP = Value
 	end    
 })
 
