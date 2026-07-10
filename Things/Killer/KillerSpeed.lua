@@ -4,7 +4,7 @@ local LocalPlayer = Players.LocalPlayer
 
 local currentSession = os.clock()
 _G.ScriptSessionID = currentSession
-_G.KillerSpeed = _G.KillerSpeed or 25
+_G.KillerSpeed = _G.KillerSpeed or 1
 _G.SpeedToggle = _G.SpeedToggle or false
 
 local SCRIPT_TAG = "KillerSpeedMonitor"
