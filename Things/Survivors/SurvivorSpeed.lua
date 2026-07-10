@@ -10,7 +10,7 @@ _G.SurvivorSpeedToggle = _G.SurvivorSpeedToggle or false
 local SCRIPT_TAG = "SurvivorSpeedMonitor"
 
 if _G[SCRIPT_TAG] then
-    _G[SCRIPT_TAG]()
+    pcall(function() _G[SCRIPT_TAG]() end)
 end
 
 local function cleanup()
@@ -37,22 +37,23 @@ end
 
 _G.SurvivorEnforcer = RunService.Heartbeat:Connect(function()
     if _G.ScriptSessionID ~= currentSession then return end
-    
-    local char = LocalPlayer.Character
-    if not char then return end
-    
+
     if not _G.SurvivorSpeedToggle then
-        if char:GetAttribute("speedboost") ~= 0 then
-            char:SetAttribute("speedboost", 0)
+        if LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
+            local char = LocalPlayer.Character
+            if char and char:GetAttribute("speedboost") ~= 0 then
+                char:SetAttribute("speedboost", 0)
+            end
         end
         return
     end
-    
+
+    local char = LocalPlayer.Character
+    if not char then return end
+
     if LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
-        char:SetAttribute("speedboost", _G.SurvivorSpeed)
-    else
-        if char:GetAttribute("speedboost") ~= 0 then
-            char:SetAttribute("speedboost", 0)
+        if char:GetAttribute("speedboost") ~= _G.SurvivorSpeed then
+            char:SetAttribute("speedboost", _G.SurvivorSpeed)
         end
     end
 end)
@@ -61,12 +62,12 @@ local function setupSurvivorWatcher(character)
     if _G.SurvivorBoostConnection then
         pcall(function() _G.SurvivorBoostConnection:Disconnect() end)
     end
-    
+
     _G.SurvivorBoostConnection = character:GetAttributeChangedSignal("speedboost"):Connect(function()
         if _G.ScriptSessionID ~= currentSession then return end
         if not _G.SurvivorSpeedToggle then return end
         if not LocalPlayer.Team or LocalPlayer.Team.Name ~= "Survivors" then return end
-        
+
         if character:GetAttribute("speedboost") ~= _G.SurvivorSpeed then
             character:SetAttribute("speedboost", _G.SurvivorSpeed)
         end
@@ -79,12 +80,12 @@ end
 
 _G.SurvivorCharacterAddedConnection = LocalPlayer.CharacterAdded:Connect(function(character)
     if _G.ScriptSessionID ~= currentSession then return end
-    
+
     task.delay(0.15, function()
         if _G.ScriptSessionID ~= currentSession then return end
         if not _G.SurvivorSpeedToggle then return end
         if not LocalPlayer.Team or LocalPlayer.Team.Name ~= "Survivors" then return end
-        
+
         if character then
             character:SetAttribute("speedboost", _G.SurvivorSpeed)
             setupSurvivorWatcher(character)
