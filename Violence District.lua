@@ -377,10 +377,82 @@ local Section = Tab:AddSection({
 	Name = "The Killer"
 })
 
-Tab:AddDropdown({Name = "Select Sound", Default = _G.SelectedSound or (_G.SoundOptions and _G.SoundOptions[1]) or "Sound 1", Options = _G.SoundOptions or {"Sound 1", "Sound 2", "Sound 3"}, Callback = function(Value) _G.SelectedSound = Value end})
-Tab:AddTextbox({Name = "Volume", Default = _G.Volume or "0.5", TextDisappear = false, Callback = function(Value) _G.Volume = Value end})
-Tab:AddTextbox({Name = "Distance", Default = _G.Distance or "50", TextDisappear = false, Callback = function(Value) _G.Distance = Value end})
-Tab:AddButton({Name = "Play Sound", Callback = function() if _G.PlaySound then _G.PlaySound() end end})
+Tab:AddDropdown({
+    Name = "Select Sound",
+    Default = _G.SelectedSoundKiller or (_G.SoundOptionsKiller and _G.SoundOptionsKiller[1]) or "Music 1",
+    Options = _G.SoundOptionsKiller or {"Music 1", "Music 2"},
+    Callback = function(Value)
+        _G.SelectedSoundKiller = Value
+    end
+})
+
+Tab:AddTextbox({
+    Name = "Volume",
+    Default = _G.VolumeKiller or "0.5",
+    TextDisappear = false,
+    Callback = function(Value)
+        _G.VolumeKiller = Value
+    end
+})
+
+Tab:AddTextbox({
+    Name = "Distance",
+    Default = _G.DistanceKiller or "50",
+    TextDisappear = false,
+    Callback = function(Value)
+        _G.DistanceKiller = Value
+    end
+})
+
+Tab:AddButton({
+    Name = "Play Sound",
+    Callback = function()
+        if _G.PlaySoundKiller then
+            _G.PlaySoundKiller()
+        end
+    end
+})
+
+local Section = Tab:AddSection({
+	Name = "The Veil"
+})
+
+Tab:AddDropdown({
+    Name = "Select Sound",
+    Default = _G.SelectedSoundVeil or (_G.SoundOptionsVeil and _G.SoundOptionsVeil[1]) or "Music 1",
+    Options = _G.SoundOptionsVeil or {"Music 1", "Music 2"},
+    Callback = function(Value)
+        _G.SelectedSoundVeil = Value
+    end
+})
+
+Tab:AddTextbox({
+    Name = "Volume",
+    Default = _G.VolumeVeil or "0.5",
+    TextDisappear = false,
+    Callback = function(Value)
+        _G.VolumeVeil = Value
+    end
+})
+
+Tab:AddTextbox({
+    Name = "Distance",
+    Default = _G.DistanceVeil or "50",
+    TextDisappear = false,
+    Callback = function(Value)
+        _G.DistanceVeil = Value
+    end
+})
+
+Tab:AddButton({
+    Name = "Play Sound",
+    Callback = function()
+        if _G.PlaySoundVeil then
+            _G.PlaySoundVeil()
+        end
+    end
+})
+
 -------------------------Survivors---------------------------
 
 local Tab = Window:MakeTab({
