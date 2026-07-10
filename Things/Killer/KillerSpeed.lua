@@ -4,51 +4,68 @@ local LocalPlayer = Players.LocalPlayer
 local currentSession = os.clock()
 _G.ScriptSessionID = currentSession
 
-_G.KillerSpeed = _G.KillerSpeed or 5
+_G.KillerSpeed = _G.KillerSpeed or 25
 _G.SpeedToggle = _G.SpeedToggle or false
-local defaultSpeed = 16
 
-local isChangingSpeed = false 
+local isChangingSpeed = false
 
 local function monitorSpeed(character)
-	local humanoid = character:WaitForChild("Humanoid", 5)
-	if not humanoid then return end
-	
-	defaultSpeed = humanoid.WalkSpeed
+    local humanoid = character:WaitForChild("Humanoid", 5)
+    if not humanoid then return end
 
-	if _G.SpeedConnection then _G.SpeedConnection:Disconnect() end
-	
-	_G.SpeedConnection = humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
-		if _G.ScriptSessionID ~= currentSession then return end
-		if isChangingSpeed then return end
-		
-		if _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
-			if humanoid.WalkSpeed ~= _G.KillerSpeed then
-				defaultSpeed = humanoid.WalkSpeed
-				
-				isChangingSpeed = true
-				humanoid.WalkSpeed = _G.KillerSpeed
-				isChangingSpeed = false
-			end
-		else
-			defaultSpeed = humanoid.WalkSpeed
-		end
-	end)
+    local function applySpeed()
+        if not _G.SpeedToggle then return end
+        if LocalPlayer.Team and LocalPlayer.Team.Name ~= "Killer" then return end
 
-	if _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
-		isChangingSpeed = true
-		humanoid.WalkSpeed = _G.KillerSpeed
-		isChangingSpeed = false
-	end
+        isChangingSpeed = true
+        
+        character:SetAttribute("Speed", _G.KillerSpeed)
+        
+        if humanoid then
+            humanoid:SetAttribute("Speed", _G.KillerSpeed)
+        end
+        
+        local root = character:FindFirstChild("HumanoidRootPart")
+        if root then
+            root:SetAttribute("Speed", _G.KillerSpeed)
+        end
+
+        isChangingSpeed = false
+    end
+
+    if _G.SpeedConnection then _G.SpeedConnection:Disconnect() end
+    
+    _G.SpeedConnection = character:GetAttributeChangedSignal("Speed"):Connect(function()
+        if _G.ScriptSessionID ~= currentSession then return end
+        if isChangingSpeed then return end
+        if _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+            applySpeed()
+        end
+    end)
+
+    humanoid:GetAttributeChangedSignal("Speed"):Connect(function()
+        if _G.ScriptSessionID ~= currentSession then return end
+        if isChangingSpeed then return end
+        if _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+            applySpeed()
+        end
+    end)
+
+    if _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+        applySpeed()
+    end
 end
 
 if LocalPlayer.Character then
-	task.spawn(monitorSpeed, LocalPlayer.Character)
+    task.spawn(monitorSpeed, LocalPlayer.Character)
 end
 
-if _G.CharacterAddedConnection then _G.CharacterAddedConnection:Disconnect() end
+if _G.CharacterAddedConnection then 
+    _G.CharacterAddedConnection:Disconnect() 
+end
+
 _G.CharacterAddedConnection = LocalPlayer.CharacterAdded:Connect(function(character)
-	if _G.ScriptSessionID == currentSession then
-		monitorSpeed(character)
-	end
+    if _G.ScriptSessionID == currentSession then
+        task.spawn(monitorSpeed, character)
+    end
 end)
