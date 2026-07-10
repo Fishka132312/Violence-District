@@ -1,4 +1,4 @@
-local Players = game:GetService("Players") ----уйцуцйуйу
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local player = Players.LocalPlayer
@@ -11,13 +11,13 @@ local moveConnection = nil
 if _G.PlayAnimation then return end
 
 local function stopCurrent()
-    if currentTrack then 
-        currentTrack:Stop() 
-        currentTrack = nil 
+    if currentTrack then
+        currentTrack:Stop()
+        currentTrack = nil
     end
-    if moveConnection then 
-        moveConnection:Disconnect() 
-        moveConnection = nil 
+    if moveConnection then
+        moveConnection:Disconnect()
+        moveConnection = nil
     end
 end
 
@@ -26,21 +26,20 @@ local function PlayAnimation(animId, loop, moveType)
 
     local anim = Instance.new("Animation")
     anim.AnimationId = "rbxassetid://" .. tostring(animId)
-    
+
     currentTrack = humanoid:LoadAnimation(anim)
-    
     currentTrack.Priority = Enum.AnimationPriority.Movement
-    
-    if loop then 
-        currentTrack.Looped = true 
+
+    if loop ~= false then
+        currentTrack.Looped = true
     end
-    
+
     currentTrack:Play()
 
     if moveType == "standing" or moveType == "walking" then
         moveConnection = RunService.Heartbeat:Connect(function()
             local isMoving = humanoid.MoveDirection.Magnitude > 0.1
-            
+
             local shouldPlay = false
             if moveType == "standing" then
                 shouldPlay = not isMoving
@@ -50,6 +49,7 @@ local function PlayAnimation(animId, loop, moveType)
 
             if shouldPlay then
                 if currentTrack and not currentTrack.IsPlaying then
+                    currentTrack.TimePosition = 0
                     currentTrack:Play()
                 end
             else
