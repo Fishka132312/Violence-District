@@ -45,7 +45,7 @@ local function createESP(target)
     local highlight = activeVisuals[target].Highlight
     if not highlight or highlight.Parent ~= target then
         if highlight then highlight:Destroy() end
-        
+       
         highlight = Instance.new("Highlight")
         highlight.Name = "WinPalletHighlight"
         highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
@@ -58,36 +58,41 @@ local function createESP(target)
     end
 end
 
+local targetNames = {
+    ["Window"] = true,
+    ["Pallet"] = true,
+    ["PalletWrong"] = true,
+    ["Palletwrong"] = true,
+}
+
 local connection
 connection = RunService.RenderStepped:Connect(function()
     local mapFolder = getMapFolder()
-    
+   
     if mapFolder and _G.WinPaletEsp then
         for _, obj in ipairs(mapFolder:GetDescendants()) do
-            if (obj.Name == "Window" or obj.Name == "PalletWrong") 
-               and (obj:IsA("Model") or obj:IsA("BasePart")) then
-                
+            if targetNames[obj.Name] and (obj:IsA("Model") or obj:IsA("BasePart")) then
                 createESP(obj)
             end
         end
-        
-        for target, _ in pairs(activeVisuals) do
+       
+        for target in pairs(activeVisuals) do
             if not target or not target:IsDescendantOf(mapFolder) then
                 removeESP(target)
             end
         end
     else
-        for target, _ in pairs(activeVisuals) do
+        for target in pairs(activeVisuals) do
             removeESP(target)
         end
     end
 end)
 
 local function cleanup()
-    if connection then 
-        connection:Disconnect() 
+    if connection then
+        connection:Disconnect()
     end
-    for target, _ in pairs(activeVisuals) do
+    for target in pairs(activeVisuals) do
         removeESP(target)
     end
 end
