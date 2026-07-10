@@ -682,7 +682,7 @@ Tab:AddButton({
 	Name = "Ползать",
 	Callback = function()
 			_G.StopAnimation()
-			wait(0.1
+			wait(0.1)
 			_G.PlayAnimation(78719043959654, "walking", true, "looped")
 			wait(0.1)
 			_G.PlayAnimation(126526181422628, "standing", true, "looped")
