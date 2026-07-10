@@ -312,27 +312,34 @@ Tab:AddSlider({
     ValueName = "speed",
     Callback = function(Value)
         _G.KillerSpeed = Value
-        
+
         local char = LocalPlayer.Character
-        if char and _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+        if char and _G.SpeedToggle 
+           and LocalPlayer.Team 
+           and LocalPlayer.Team.Name == "Killer" then
+            
             char:SetAttribute("speedboost", Value)
         end
     end
 })
 
 Tab:AddToggle({
-    Name = "Apply speed",
+    Name = "Apply Killer Speed",
     Default = false,
     Callback = function(Value)
         _G.SpeedToggle = Value
-        
+
         local char = LocalPlayer.Character
         if not char then return end
-        
-        if Value and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
-            char:SetAttribute("speedboost", _G.KillerSpeed)
+
+        if Value then
+            if LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+                char:SetAttribute("speedboost", _G.KillerSpeed)
+            end
         else
-            char:SetAttribute("speedboost", 0)
+            if LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+                char:SetAttribute("speedboost", 0)
+            end
         end
     end
 })
@@ -440,12 +447,13 @@ Tab:AddSlider({
     ValueName = "speed",
     Callback = function(Value)
         _G.SurvivorSpeed = Value
-        
-        local character = LocalPlayer.Character
-        if character and _G.SurvivorSpeedToggle 
-           and LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
+
+        local char = LocalPlayer.Character
+        if char and _G.SurvivorSpeedToggle 
+           and LocalPlayer.Team 
+           and LocalPlayer.Team.Name == "Survivors" then
             
-            character:SetAttribute("speedboost", Value)
+            char:SetAttribute("speedboost", Value)
         end
     end
 })
@@ -455,14 +463,18 @@ Tab:AddToggle({
     Default = false,
     Callback = function(Value)
         _G.SurvivorSpeedToggle = Value
-        
-        local character = LocalPlayer.Character
-        if not character then return end
-        
-        if Value and LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
-            character:SetAttribute("speedboost", _G.SurvivorSpeed)
+
+        local char = LocalPlayer.Character
+        if not char then return end
+
+        if Value then
+            if LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
+                char:SetAttribute("speedboost", _G.SurvivorSpeed)
+            end
         else
-            character:SetAttribute("speedboost", 0)
+            if LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
+                char:SetAttribute("speedboost", 0)
+            end
         end
     end
 })
