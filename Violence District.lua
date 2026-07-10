@@ -681,6 +681,8 @@ local Section = Tab:AddSection({
 Tab:AddButton({
 	Name = "Ползать",
 	Callback = function()
+			_G.StopAnimation()
+			wait(0.1
 			_G.PlayAnimation(78719043959654, "walking", true, "looped")
 			wait(0.1)
 			_G.PlayAnimation(126526181422628, "standing", true, "looped")
@@ -690,9 +692,22 @@ Tab:AddButton({
 Tab:AddButton({
 	Name = "Injured",
 	Callback = function()
+			_G.StopAnimation()
+			wait(0.1)
 			_G.PlayAnimation(135084204086504, "walking", true, "looped")
 			wait(0.1)
 			_G.PlayAnimation(72208365305487, "standing", true, "looped")
+  	end    
+})
+
+Tab:AddButton({
+	Name = "RUNNNN",
+	Callback = function()
+			_G.StopAnimation()
+			wait(0.1)
+			_G.PlayAnimation(116093934008204, "walking", true, "looped")
+			wait(0.1)
+			_G.PlayAnimation(134758728973154, "standing", true, "looped")
   	end    
 })
 -------------------------Shader---------------------------
