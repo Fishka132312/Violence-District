@@ -13,7 +13,6 @@ local hooks = {}
 local currentIndex = 0
 local lastTeleportTime = 0
 local COOLDOWN = 0.6
-
 local currentKey = Enum.KeyCode.V
 
 local function getMapFolder()
@@ -24,12 +23,19 @@ local function updateHooks()
     hooks = {}
     local mapFolder = getMapFolder()
     if not mapFolder then return end
-    
+
     for _, obj in ipairs(mapFolder:GetDescendants()) do
-        if obj.Name == "Hook" and (obj:IsA("Model") or obj:IsA("BasePart")) then
-            local rootPart = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
-            if rootPart then
-                table.insert(hooks, rootPart)
+        if obj.Name == "Hook" then
+            local hookPoint = nil
+
+            if obj:IsA("Model") then
+                hookPoint = obj:FindFirstChild("HookPoint")
+            elseif obj:IsA("BasePart") then
+                hookPoint = obj:FindFirstChild("HookPoint") or obj
+            end
+
+            if hookPoint and hookPoint:IsA("BasePart") then
+                table.insert(hooks, hookPoint)
             end
         end
     end
@@ -38,22 +44,23 @@ end
 local function teleportToNextHook()
     if tick() - lastTeleportTime < COOLDOWN then return end
     lastTeleportTime = tick()
-    
+
     updateHooks()
     if #hooks == 0 then return end
-    
+
     currentIndex = currentIndex + 1
     if currentIndex > #hooks then currentIndex = 1 end
-    
+
     local target = hooks[currentIndex]
     if not target then return end
-    
+
     local character = LocalPlayer.Character
     if not character then return end
+
     local root = character:FindFirstChild("HumanoidRootPart")
     if not root then return end
-    
-    root.CFrame = target.CFrame * CFrame.new(0, 6, 0)
+
+    root.CFrame = target.CFrame * CFrame.new(0, 2.5, 0)
 end
 
 local keyConnection
