@@ -339,7 +339,7 @@ Tab:AddToggle({
             end
         else
             if LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
-                char:SetAttribute("speedboost", 0)
+                char:SetAttribute("speedboost", 1)
             end
         end
     end
@@ -546,7 +546,7 @@ Tab:AddToggle({
             end
         else
             if LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
-                char:SetAttribute("speedboost", 0)
+                char:SetAttribute("speedboost", 1)
             end
         end
     end
