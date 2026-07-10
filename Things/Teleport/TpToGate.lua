@@ -14,7 +14,7 @@ local currentIndex = 0
 local lastTeleportTime = 0
 local COOLDOWN = 0.6
 
-local currentKey = Enum.KeyCode.G
+local currentKey = Enum.KeyCode.H
 
 local function getMapFolder()
     return workspace:FindFirstChild("Map")
