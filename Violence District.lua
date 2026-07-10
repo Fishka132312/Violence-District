@@ -22,6 +22,9 @@ local scripts = {
 	'Whitelist.lua',
 	'Main/ShowPlayerInfo.lua',
 	'Main/Fullbright.lua',
+	'Teleport/TpToGate.lua',
+	'Teleport/TpToGen.lua',
+	'Teleport/TpToHook.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
@@ -439,21 +442,30 @@ local Section = Tab:AddSection({
 Tab:AddButton({
 	Name = "Tp To Generator",
 	Callback = function()
-			loadstring(game:HttpGet('https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/Teleport/TpToGen.lua'))()
-  	end    
+			local signal = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("GenTeleportSignal", true)
+if signal then
+    signal:Fire()
+end
+		end    
 })
 
 Tab:AddButton({
 	Name = "Tp To Hook",
 	Callback = function()
-			loadstring(game:HttpGet('https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/Teleport/TpToHook.lua'))()
-  	end    
+			local signal = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("HookTeleportSignal", true)
+if signal then
+    signal:Fire()
+end
+		end    
 })
 
 Tab:AddButton({
 	Name = "Tp To Exit",
 	Callback = function()
-			loadstring(game:HttpGet('https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/Teleport/TpToGate.lua'))()
+			local signal = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("GateTeleportSignal", true)
+if signal then
+    signal:Fire()
+end
   	end    
 })
 
