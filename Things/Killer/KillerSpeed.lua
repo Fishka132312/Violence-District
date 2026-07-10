@@ -18,6 +18,10 @@ local function cleanup()
         pcall(function() _G.SpeedEnforcer:Disconnect() end)
         _G.SpeedEnforcer = nil
     end
+    if _G.SpeedChangedConnection then 
+        pcall(function() _G.SpeedChangedConnection:Disconnect() end)
+        _G.SpeedChangedConnection = nil
+    end
     if _G.CharacterAddedConnection then 
         pcall(function() _G.CharacterAddedConnection:Disconnect() end)
         _G.CharacterAddedConnection = nil
@@ -50,15 +54,29 @@ _G.SpeedEnforcer = RunService.Heartbeat:Connect(function()
     local isKiller = LocalPlayer.Team and LocalPlayer.Team.Name == "Killer"
     
     if isKiller then
-        if hum.WalkSpeed ~= _G.KillerSpeed then
-            hum.WalkSpeed = _G.KillerSpeed
-        end
+        hum.WalkSpeed = _G.KillerSpeed
     else
         if hum.WalkSpeed ~= 16 then
             hum.WalkSpeed = 16
         end
     end
 end)
+
+local function setupSpeedWatcher(humanoid)
+    if _G.SpeedChangedConnection then
+        pcall(function() _G.SpeedChangedConnection:Disconnect() end)
+    end
+    
+    _G.SpeedChangedConnection = humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+        if _G.ScriptSessionID ~= currentSession then return end
+        if not _G.SpeedToggle then return end
+        if not LocalPlayer.Team or LocalPlayer.Team.Name ~= "Killer" then return end
+        
+        if humanoid.WalkSpeed ~= _G.KillerSpeed then
+            humanoid.WalkSpeed = _G.KillerSpeed
+        end
+    end)
+end
 
 if _G.CharacterAddedConnection then
     pcall(function() _G.CharacterAddedConnection:Disconnect() end)
@@ -67,7 +85,7 @@ end
 _G.CharacterAddedConnection = LocalPlayer.CharacterAdded:Connect(function(character)
     if _G.ScriptSessionID ~= currentSession then return end
     
-    task.delay(0.12, function()
+    task.delay(0.1, function()
         if _G.ScriptSessionID ~= currentSession then return end
         if not _G.SpeedToggle then return end
         if not LocalPlayer.Team or LocalPlayer.Team.Name ~= "Killer" then return end
@@ -75,14 +93,17 @@ _G.CharacterAddedConnection = LocalPlayer.CharacterAdded:Connect(function(charac
         local hum = character:FindFirstChildOfClass("Humanoid")
         if hum then
             hum.WalkSpeed = _G.KillerSpeed
+            setupSpeedWatcher(hum)
         end
     end)
 end)
 
 if LocalPlayer.Character then
     local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-    if hum and _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
-        hum.WalkSpeed = _G.KillerSpeed
+    if hum then
+        if _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+            hum.WalkSpeed = _G.KillerSpeed
+        end
+        setupSpeedWatcher(hum)
     end
 end
-
