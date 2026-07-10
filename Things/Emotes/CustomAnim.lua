@@ -12,37 +12,62 @@ local animConnection = nil
 local stoppedConnection = nil
 local ignoreNextStopped = false
 
-local function stopCurrentAnimation()
-    if currentTrack then
+local activeTracks = {}
+
+local function stopCurrentAnimation(animIdToKeep)
+    for id, track in pairs(activeTracks) do
+        if not animIdToKeep or tostring(id) ~= tostring(animIdToKeep) then
+            pcall(function()
+                if track and track.IsPlaying then
+                    track:Stop()
+                end
+            end)
+            activeTracks[id] = nil
+        end
+    end
+    
+    if not animIdToKeep then
+        currentAnimType = nil
+        currentPersist = false
+        currentLoopMode = nil
+        animationStarted = false
+        ignoreNextStopped = false
+        
+        if animConnection then
+            pcall(function() animConnection:Disconnect() end)
+            animConnection = nil
+        end
+        if stoppedConnection then
+            pcall(function() stoppedConnection:Disconnect() end)
+            stoppedConnection = nil
+        end
+    end
+end
+
+local function StopSpecificAnimation(animId)
+    if not animId then
+        stopCurrentAnimation()
+        return
+    end
+    local id = tostring(animId)
+    local track = activeTracks[id]
+    if track then
         pcall(function()
-            if currentTrack.IsPlaying then
-                currentTrack:Stop()
+            if track.IsPlaying then
+                track:Stop()
             end
         end)
-        currentTrack = nil
-    end
-    currentAnimType = nil
-    currentPersist = false
-    currentLoopMode = nil
-    animationStarted = false
-    ignoreNextStopped = false
-    if animConnection then
-        pcall(function() animConnection:Disconnect() end)
-        animConnection = nil
-    end
-    if stoppedConnection then
-        pcall(function() stoppedConnection:Disconnect() end)
-        stoppedConnection = nil
+        activeTracks[id] = nil
     end
 end
 
 local function PlayAnimation(animId, animType, persist, loopMode)
-    stopCurrentAnimation()
     if not animId then return end
 
     local anim = Instance.new("Animation")
     anim.AnimationId = "rbxassetid://" .. tostring(animId)
     currentTrack = humanoid:LoadAnimation(anim)
+    activeTracks[tostring(animId)] = currentTrack
     currentAnimType = animType
     currentPersist = persist or false
     currentLoopMode = loopMode or "nonlooped"
@@ -69,9 +94,6 @@ local function PlayAnimation(animId, animType, persist, loopMode)
 
     if currentAnimType ~= "standing" and currentAnimType ~= "walking" then
         currentTrack:Play()
-        currentAnimType = nil
-        currentPersist = false
-        currentLoopMode = nil
         return
     end
 
@@ -99,7 +121,7 @@ local function PlayAnimation(animId, animType, persist, loopMode)
                     ignoreNextStopped = true
                     currentTrack:Stop()
                 else
-                    stopCurrentAnimation()
+                    stopCurrentAnimation(currentAnimType)
                 end
             end
         end
@@ -114,8 +136,12 @@ local function PlayAnimation(animId, animType, persist, loopMode)
     end)
 end
 
-local function StopAnimation()
-    stopCurrentAnimation()
+local function StopAnimation(animId)
+    if animId then
+        StopSpecificAnimation(animId)
+    else
+        stopCurrentAnimation()
+    end
 end
 
 _G.PlayAnimation = PlayAnimation
