@@ -1,86 +1,67 @@
 local SCRIPT_TAG = "GenTeleport"
+if _G[SCRIPT_TAG] then _G[SCRIPT_TAG]() end
 
-if _G[SCRIPT_TAG] then
-    _G[SCRIPT_TAG]()
-end
-
+local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
+local TeleportBindable = Instance.new("BindableEvent")
+TeleportBindable.Name = "GenTeleportSignal"
+
+local generators = {}
+local currentIndex = 0
+local lastTeleportTime = 0
+local COOLDOWN = 0.2
 
 local function getMapFolder()
     return workspace:FindFirstChild("Map")
 end
 
-local function findAllGenerators()
+local function updateGenerators()
+    generators = {}
     local mapFolder = getMapFolder()
-    if not mapFolder then return {} end
-    
-    local generators = {}
+    if not mapFolder then return end
     
     for _, obj in ipairs(mapFolder:GetDescendants()) do
         if obj.Name == "Generator" and (obj:IsA("Model") or obj:IsA("BasePart")) then
-            table.insert(generators, obj)
+            local rootPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")) or obj
+            if rootPart then
+                table.insert(generators, rootPart)
+            end
         end
     end
-    
-    return generators
 end
 
-if _G.GenCycleIndex == nil then
-    _G.GenCycleIndex = 1
-end
-
-local function teleportToNextGenerator()
-    local generators = findAllGenerators()
+local function teleportToNext()
+    if tick() - lastTeleportTime < COOLDOWN then return end
+    lastTeleportTime = tick()
     
-    if #generators == 0 then
-        print("❌ Генераторы не найдены!")
-        return
-    end
+    local mapFolder = getMapFolder()
+    if not mapFolder then return end
     
-    local currentIndex = _G.GenCycleIndex
-    local targetGen = generators[currentIndex]
+    updateGenerators()
+    if #generators == 0 then return end
     
-    local rootPart = targetGen:IsA("Model") and 
-        (targetGen.PrimaryPart or targetGen:FindFirstChildWhichIsA("BasePart")) or 
-        targetGen
+    currentIndex = currentIndex + 1
+    if currentIndex > #generators then currentIndex = 1 end
     
-    if not rootPart then
-        print("⚠️ Проблема с генератором #" .. currentIndex)
-        _G.GenCycleIndex = (_G.GenCycleIndex % #generators) + 1
-        return
-    end
+    local target = generators[currentIndex]
+    if not target then return end
     
     local character = LocalPlayer.Character
-    if not character or not character:FindFirstChild("HumanoidRootPart") then
-        print("⚠️ Персонаж не готов")
-        return
-    end
+    if not character then return end
     
-    local hrp = character.HumanoidRootPart
-    hrp.CFrame = rootPart.CFrame * CFrame.new(0, 5, 0)  -- чуть выше
+    local root = character:FindFirstChild("HumanoidRootPart")
+    if not root then return end
     
-    print(string.format("📍 Телепорт %d/%d → Генератор #%d", 
-        currentIndex, #generators, currentIndex))
-    
-    _G.GenCycleIndex = (_G.GenCycleIndex % #generators) + 1
+    root.CFrame = target.CFrame + Vector3.new(0, 5, 0)
 end
 
+TeleportBindable.Event:Connect(teleportToNext)
+
 local function cleanup()
-    print("🧹 Цикличный телепорт к генераторам выгружен")
-    _G.GenCycleIndex = nil
+    if TeleportBindable then
+        TeleportBindable:Destroy()
+    end
 end
 
 _G[SCRIPT_TAG] = cleanup
-
-print("🔄 Цикличный телепорт к генераторам загружен!")
-print("Напиши в чат `nextgen` или `gen` для телепорта к следующему генератору")
-
-local chatConnection = LocalPlayer.Chatted:Connect(function(msg)
-    local text = msg:lower()
-    if text == "nextgen" or text == "gen" or text == "next" then
-        teleportToNextGenerator()
-    end
-end)
-
-_G[SCRIPT_TAG .. "_chat"] = chatConnection
