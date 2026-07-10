@@ -646,7 +646,14 @@ Tab:AddButton({
 Tab:AddButton({
 	Name = "Arm Up",
 	Callback = function()
-			_G.PlayAnimation(117042998468241, "standing")
+			_G.PlayAnimation(117042998468241, "standing", true)
+  	end    
+})
+
+Tab:AddButton({
+	Name = "Arm Up",
+	Callback = function()
+			_G.PlayAnimation(117042998468241, "standing", false)
   	end    
 })
 
