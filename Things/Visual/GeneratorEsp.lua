@@ -9,7 +9,7 @@ if _G[SCRIPT_TAG] then
     _G[SCRIPT_TAG]()
 end
 
-_G.EspGenerators = true
+_G.EspGenerators = false
 local GEN_COLOR = Color3.fromRGB(0, 255, 100)
 
 local activeGenVisuals = {}
