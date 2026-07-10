@@ -646,21 +646,42 @@ Tab:AddButton({
 Tab:AddButton({
 	Name = "Arm Up",
 	Callback = function()
-			_G.PlayAnimation(117042998468241, "standing", true)
+			_G.PlayAnimation(117042998468241, "standing", false, "nonlooped")
   	end    
 })
 
 Tab:AddButton({
-	Name = "Arm Up",
+	Name = "Attack",
 	Callback = function()
-			_G.PlayAnimation(117042998468241, "standing", false)
+			_G.PlayAnimation(133963973694098, "nonlooped")
   	end    
 })
 
 Tab:AddButton({
 	Name = "LOL",
 	Callback = function()
-			_G.PlayAnimation(129967390, "standing")
+			_G.PlayAnimation(129967390, "standing", false, "nonlooped")
+  	end    
+})
+
+Tab:AddButton({
+	Name = "Goida",
+	Callback = function()
+			_G.PlayAnimation(84440437648153, "nonlooped")
+  	end    
+})
+
+Tab:AddButton({
+	Name = "Kick Generator",
+	Callback = function()
+			_G.PlayAnimation(135181748009911, "standing", false, "nonlooped")
+  	end    
+})
+
+Tab:AddButton({
+	Name = "Walking Enjure",
+	Callback = function()
+			_G.PlayAnimation(140463265233127, "walking", true, "looped")
   	end    
 })
 -------------------------Shader---------------------------
