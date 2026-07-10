@@ -1,7 +1,7 @@
 if _G.SoundPlayerLoaded then return end
 _G.SoundPlayerLoaded = true
-_G.SoundOptions = {"Sound 1", "Sound 2", "Sound 3"}
-_G.SoundIDs = {["Sound 1"] = "134620826525006", ["Sound 2"] = "123456789012345", ["Sound 3"] = "987654321098765"}
+_G.SoundOptions = {"Music 1", "Music 2"}
+_G.SoundIDs = {["Sound 1"] = "70576975385144", ["Sound 2"] = "83811853473249"}
 _G.SelectedSound = _G.SoundOptions[1]
 _G.Volume = "0.5"
 _G.Distance = "50"
