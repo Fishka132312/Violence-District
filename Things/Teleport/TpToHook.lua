@@ -1,82 +1,67 @@
 local SCRIPT_TAG = "HookTeleport"
+if _G[SCRIPT_TAG] then _G[SCRIPT_TAG]() end
 
-if _G[SCRIPT_TAG] then
-    _G[SCRIPT_TAG]()
-end
-
+local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
+local TeleportBindable = Instance.new("BindableEvent")
+TeleportBindable.Name = "HookTeleportSignal"
+
+local hooks = {}
+local currentIndex = 0
+local lastTeleportTime = 0
+local COOLDOWN = 0.5
 
 local function getMapFolder()
     return workspace:FindFirstChild("Map")
 end
 
-local function findAllHooks()
+local function updateHooks()
+    hooks = {}
     local mapFolder = getMapFolder()
-    if not mapFolder then return {} end
-    
-    local hooks = {}
+    if not mapFolder then return end
     
     for _, obj in ipairs(mapFolder:GetDescendants()) do
         if obj.Name == "Hook" and (obj:IsA("Model") or obj:IsA("BasePart")) then
-            table.insert(hooks, obj)
+            local rootPart = obj:IsA("Model") and (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")) or obj
+            if rootPart then
+                table.insert(hooks, rootPart)
+            end
         end
     end
-    
-    return hooks
-end
-
-if _G.HookCycleIndex == nil then
-    _G.HookCycleIndex = 1
 end
 
 local function teleportToNextHook()
-    local hooks = findAllHooks()
+    if tick() - lastTeleportTime < COOLDOWN then return end
+    lastTeleportTime = tick()
     
-    if #hooks == 0 then
-        print("❌ Хуки не найдены!")
-        return
-    end
+    local mapFolder = getMapFolder()
+    if not mapFolder then return end
     
-    local currentIndex = _G.HookCycleIndex
-    local targetHook = hooks[currentIndex]
+    updateHooks()
+    if #hooks == 0 then return end
     
-    local rootPart = targetHook:IsA("Model") and 
-        (targetHook.PrimaryPart or targetHook:FindFirstChildWhichIsA("BasePart")) or 
-        targetHook
+    currentIndex = currentIndex + 1
+    if currentIndex > #hooks then currentIndex = 1 end
     
-    if not rootPart then
-        _G.HookCycleIndex = (_G.HookCycleIndex % #hooks) + 1
-        return
-    end
+    local target = hooks[currentIndex]
+    if not target then return end
     
     local character = LocalPlayer.Character
-    if not character or not character:FindFirstChild("HumanoidRootPart") then
-        return
-    end
+    if not character then return end
     
-    local hrp = character.HumanoidRootPart
-    hrp.CFrame = rootPart.CFrame * CFrame.new(0, 5, 0)
+    local root = character:FindFirstChild("HumanoidRootPart")
+    if not root then return end
     
-    print(string.format("📍 Хук %d/%d", currentIndex, #hooks))
-    
-    _G.HookCycleIndex = (_G.HookCycleIndex % #hooks) + 1
+    root.CFrame = target.CFrame + Vector3.new(0, 5, 0)
 end
 
+TeleportBindable.Event:Connect(teleportToNextHook)
+
 local function cleanup()
-    print("HookCycleTP cleared")
-    _G.HookCycleIndex = nil
+    if TeleportBindable then
+        TeleportBindable:Destroy()
+    end
 end
 
 _G[SCRIPT_TAG] = cleanup
-
-print("[HOOK CYCLE TP] Загружен! Пиши в чат: hook")
-
-local chatConnection = LocalPlayer.Chatted:Connect(function(msg)
-    local text = msg:lower()
-    if text == "hook" or text == "nexthook" then
-        teleportToNextHook()
-    end
-end)
-
-_G[SCRIPT_TAG .. "_chat"] = chatConnection
