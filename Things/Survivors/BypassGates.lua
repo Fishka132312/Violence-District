@@ -4,66 +4,46 @@ if getgenv()[scriptId] then
     getgenv()[scriptId]:Disconnect()
 end
 
-local originalStates = {}
-local map = workspace:WaitForChild("Map")
+local RunService = game:GetService("RunService")
 
-local function getGateState()
-    local enabledGates = 0
-    local totalGates = 0
-    
-    for _, gate in ipairs(map:GetChildren()) do
-        if gate.Name == "Gate" and gate:IsA("Model") then
-            totalGates += 1
-            local isBypassed = false
-            
-            for _, part in ipairs(gate:GetDescendants()) do
-                if part:IsA("BasePart") and not part:IsDescendantOf(gate:FindFirstChild("ExitLever") or Instance.new("Folder")) then
-                    if part.Transparency == 1 and not part.CanCollide then
-                        isBypassed = true
-                        break
-                    end
-                end
-            end
-            
-            if isBypassed then
-                enabledGates += 1
+local originalStates = {}
+local lastState = nil
+
+local function getAllGates()
+    local gates = {}
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("Model") then
+            if obj.Name:lower():find("gate") or obj:FindFirstChild("ExitLever") then
+                table.insert(gates, obj)
             end
         end
     end
-    
-    if totalGates == 0 then
-        return "❌ Гейты не найдены"
-    elseif enabledGates == totalGates then
-        return "✅ Все гейты **выключены** (bypass активен)"
-    elseif enabledGates == 0 then
-        return "🔴 Все гейты **включены** (bypass выключен)"
-    else
-        return string.format("⚠️ Частично: %d/%d гейтов выключено", enabledGates, totalGates)
-    end
+    return gates
 end
 
-local function updateGates(bypassActive)
-    for _, gate in ipairs(map:GetChildren()) do
-        if gate.Name == "Gate" and gate:IsA("Model") then
-            for _, descendant in ipairs(gate:GetDescendants()) do
-                if descendant:IsA("BasePart") and not descendant:IsDescendantOf(gate:FindFirstChild("ExitLever") or Instance.new("Folder")) then
-                    
-                    if bypassActive then
-                        if not originalStates[descendant] then
-                            originalStates[descendant] = {
-                                Transparency = descendant.Transparency,
-                                CanCollide = descendant.CanCollide
-                            }
-                        end
-                        descendant.Transparency = 1
-                        descendant.CanCollide = false
-                    else
-                        if originalStates[descendant] then
-                            descendant.Transparency = originalStates[descendant].Transparency
-                            descendant.CanCollide = originalStates[descendant].CanCollide
-                        else
-                            descendant.CanCollide = true
-                        end
+local function updateGates(enable)
+    local gates = getAllGates()
+    for _, gate in ipairs(gates) do
+        for _, descendant in ipairs(gate:GetDescendants()) do
+            if descendant:IsA("BasePart") then
+                local lever = gate:FindFirstChild("ExitLever")
+                if lever and descendant:IsDescendantOf(lever) then
+                    continue
+                end
+
+                if enable then
+                    if not originalStates[descendant] then
+                        originalStates[descendant] = {
+                            Transparency = descendant.Transparency,
+                            CanCollide = descendant.CanCollide
+                        }
+                    end
+                    descendant.Transparency = 1
+                    descendant.CanCollide = false
+                else
+                    if originalStates[descendant] then
+                        descendant.Transparency = originalStates[descendant].Transparency
+                        descendant.CanCollide = originalStates[descendant].CanCollide
                     end
                 end
             end
@@ -75,18 +55,12 @@ if _G.BypassGates == nil then
     _G.BypassGates = false
 end
 
-local lastState = nil
-local connection
+local connection = RunService.Heartbeat:Connect(function()
+    local current = _G.BypassGates
 
-connection = game:GetService("RunService").Heartbeat:Connect(function()
-    local currentState = _G.BypassGates
-    
-    if currentState ~= lastState then
-        lastState = currentState
-        updateGates(currentState)
-        
-        print("🔄 BypassGates:", currentState and "ON" or "OFF")
-        print(getGateState())
+    if current ~= lastState then
+        lastState = current
+        updateGates(current)
     end
 end)
 
