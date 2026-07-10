@@ -19,6 +19,7 @@ local scripts = {
 	'Survivors/SurvivorSpeed.lua',
 	'Survivors/AutoSkillCheck.lua',
 	'Survivors/DisCollision.lua',
+	'Survivors/AntiAura.lua',
 	'Whitelist.lua',
 	'Main/ShowPlayerInfo.lua',
 	'Main/Fullbright.lua',
@@ -347,7 +348,7 @@ local Tab = Window:MakeTab({
 })
 
 local Section = Tab:AddSection({
-	Name = "da"
+	Name = "Survivors"
 })
 
 Tab:AddToggle({
@@ -371,6 +372,14 @@ Tab:AddToggle({
 	Default = false,
 	Callback = function(Value)
 		_G.AutoSkillCheck = Value
+	end    
+})
+
+Tab:AddToggle({
+	Name = "Hide Aura",
+	Default = false,
+	Callback = function(Value)
+		_G.AntiAura = Value
 	end    
 })
 
