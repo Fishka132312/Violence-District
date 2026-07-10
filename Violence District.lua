@@ -442,31 +442,67 @@ local Section = Tab:AddSection({
 Tab:AddButton({
 	Name = "Tp To Generator",
 	Callback = function()
-			local signal = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("GenTeleportSignal", true)
-if signal then
-    signal:Fire()
-end
+			local signal = LocalPlayer.PlayerGui:FindFirstChild("GenTeleportSignal")
+if signal then signal:Fire() end
 		end    
+})
+
+Tab:AddTextbox({
+    Name = "Generator Keybing",
+    Default = "G",
+    TextDisappear = true,
+    Callback = function(Value)
+        local success, key = pcall(function()
+            return Enum.KeyCode[Value]
+        end)
+        if success and key then
+            _G.GenTeleportSetKey(key)
+        end
+    end
 })
 
 Tab:AddButton({
 	Name = "Tp To Hook",
 	Callback = function()
-			local signal = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("HookTeleportSignal", true)
-if signal then
-    signal:Fire()
-end
+			local signal = LocalPlayer.PlayerGui:FindFirstChild("HookTeleportSignal")
+if signal then signal:Fire() end
 		end    
+})
+
+Tab:AddTextbox({
+    Name = "Hook Keybind",
+    Default = "V",
+    TextDisappear = true,
+    Callback = function(Value)
+        local success, key = pcall(function()
+            return Enum.KeyCode[Value]
+        end)
+        if success and key then
+            _G.HookTeleportSetKey(key)
+        end
+    end
 })
 
 Tab:AddButton({
 	Name = "Tp To Exit",
 	Callback = function()
-			local signal = game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("GateTeleportSignal", true)
-if signal then
-    signal:Fire()
-end
+			local signal = LocalPlayer.PlayerGui:FindFirstChild("GateTeleportSignal")
+if signal then signal:Fire() end
   	end    
+})
+
+Tab:AddTextbox({
+    Name = "Gate Keybing",
+    Default = "H",
+    TextDisappear = true,
+    Callback = function(Value)
+        local success, key = pcall(function()
+            return Enum.KeyCode[Value]
+        end)
+        if success and key then
+            _G.GateTeleportSetKey(key)
+        end
+    end
 })
 
 
