@@ -302,9 +302,9 @@ local LocalPlayer = Players.LocalPlayer
 
 Tab:AddSlider({
     Name = "Killer Speed",
-    Min = 0,
-    Max = 100,
-    Default = 25,
+    Min = 1,
+    Max = 25,
+    Default = 1,
     Color = Color3.fromRGB(255,255,255),
     Increment = 1,
     ValueName = "speed",
@@ -434,9 +434,9 @@ Name = "Speed"
 
 Tab:AddSlider({
     Name = "Survivor Speed",
-    Min = 0,
-    Max = 100,
-    Default = 16,
+    Min = 1,
+    Max = 25,
+    Default = 1,
     Color = Color3.fromRGB(255,255,255),
     Increment = 1,
     ValueName = "speed",
@@ -444,11 +444,10 @@ Tab:AddSlider({
         _G.SurvivorSpeed = Value
         
         local character = LocalPlayer.Character
-        if character then
-            local humanoid = character:FindFirstChild("Humanoid")
-            if humanoid and _G.SurvivorSpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
-                humanoid.WalkSpeed = Value
-            end
+        if character and _G.SurvivorSpeedToggle 
+           and LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
+            
+            character:SetAttribute("speedboost", Value)
         end
     end
 })
@@ -460,15 +459,12 @@ Tab:AddToggle({
         _G.SurvivorSpeedToggle = Value
         
         local character = LocalPlayer.Character
-        if character then
-            local humanoid = character:FindFirstChild("Humanoid")
-            if humanoid then
-                if Value and LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
-                    humanoid.WalkSpeed = _G.SurvivorSpeed
-                else
-                    humanoid.WalkSpeed = 16
-                end
-            end
+        if not character then return end
+        
+        if Value and LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
+            character:SetAttribute("speedboost", _G.SurvivorSpeed)
+        else
+            character:SetAttribute("speedboost", 0)
         end
     end
 })
