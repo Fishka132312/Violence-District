@@ -6,6 +6,7 @@ local humanoid = character:WaitForChild("Humanoid")
 local currentTrack = nil
 local currentAnimType = nil
 local currentPersist = false
+local currentLoopMode = nil
 local animationStarted = false
 local animConnection = nil
 local stoppedConnection = nil
@@ -20,26 +21,23 @@ local function stopCurrentAnimation()
         end)
         currentTrack = nil
     end
-
     currentAnimType = nil
     currentPersist = false
+    currentLoopMode = nil
     animationStarted = false
     ignoreNextStopped = false
-
     if animConnection then
         pcall(function() animConnection:Disconnect() end)
         animConnection = nil
     end
-
     if stoppedConnection then
         pcall(function() stoppedConnection:Disconnect() end)
         stoppedConnection = nil
     end
 end
 
-local function PlayAnimation(animId, animType, persist)
+local function PlayAnimation(animId, animType, persist, loopMode)
     stopCurrentAnimation()
-
     if not animId then return end
 
     local anim = Instance.new("Animation")
@@ -47,11 +45,14 @@ local function PlayAnimation(animId, animType, persist)
     currentTrack = humanoid:LoadAnimation(anim)
     currentAnimType = animType
     currentPersist = persist or false
+    currentLoopMode = loopMode or "nonlooped"
     animationStarted = false
     ignoreNextStopped = false
 
     if currentAnimType == "standing" or currentAnimType == "walking" then
-        currentTrack.Looped = false
+        currentTrack.Looped = (currentLoopMode == "looped")
+    else
+        currentTrack.Looped = (currentLoopMode == "looped")
     end
 
     local isCorrectStateNow = false
@@ -70,6 +71,7 @@ local function PlayAnimation(animId, animType, persist)
         currentTrack:Play()
         currentAnimType = nil
         currentPersist = false
+        currentLoopMode = nil
         return
     end
 
@@ -78,7 +80,6 @@ local function PlayAnimation(animId, animType, persist)
 
         local isMoving = speed > 0.1
         local stateIsCorrect = false
-
         if currentAnimType == "standing" then
             stateIsCorrect = not isMoving
         elseif currentAnimType == "walking" then
