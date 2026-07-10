@@ -1,80 +1,66 @@
 local SCRIPT_TAG = "GateTeleport"
-
-if _G[SCRIPT_TAG] then
-    _G[SCRIPT_TAG]()
-end
+if _G[SCRIPT_TAG] then _G[SCRIPT_TAG]() end
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
+local TeleportBindable = Instance.new("BindableEvent")
+TeleportBindable.Name = "GateTeleportSignal"
+
+local gates = {}
+local currentIndex = 0
+local lastTeleportTime = 0
+local COOLDOWN = 0.5
 
 local function getMapFolder()
     return workspace:FindFirstChild("Map")
 end
 
-local function findAllGates()
+local function updateGates()
+    gates = {}
     local mapFolder = getMapFolder()
-    if not mapFolder then return {} end
-    
-    local gates = {}
+    if not mapFolder then return end
     
     for _, obj in ipairs(mapFolder:GetChildren()) do
         if obj.Name == "Gate" and obj:IsA("Model") then
-            table.insert(gates, obj)
+            local rootPart = obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+            if rootPart then
+                table.insert(gates, rootPart)
+            end
         end
     end
-    
-    return gates
-end
-
-if _G.GateCycleIndex == nil then
-    _G.GateCycleIndex = 1
 end
 
 local function teleportToNextGate()
-    local gates = findAllGates()
+    if tick() - lastTeleportTime < COOLDOWN then return end
+    lastTeleportTime = tick()
     
-    if #gates == 0 then
-        print("❌ Ворота не найдены!")
-        return
-    end
+    local mapFolder = getMapFolder()
+    if not mapFolder then return end
     
-    local currentIndex = _G.GateCycleIndex
-    local targetGate = gates[currentIndex]
+    updateGates()
+    if #gates == 0 then return end
     
-    local rootPart = targetGate.PrimaryPart or targetGate:FindFirstChildWhichIsA("BasePart")
+    currentIndex = currentIndex + 1
+    if currentIndex > #gates then currentIndex = 1 end
     
-    if not rootPart then
-        _G.GateCycleIndex = (_G.GateCycleIndex % #gates) + 1
-        return
-    end
+    local target = gates[currentIndex]
+    if not target then return end
     
     local character = LocalPlayer.Character
-    if not character or not character:FindFirstChild("HumanoidRootPart") then
-        return
-    end
+    if not character then return end
     
-    local hrp = character.HumanoidRootPart
-    hrp.CFrame = rootPart.CFrame * CFrame.new(0, 5, 0)
+    local root = character:FindFirstChild("HumanoidRootPart")
+    if not root then return end
     
-    print(string.format("📍 Ворота %d/%d", currentIndex, #gates))
-    
-    _G.GateCycleIndex = (_G.GateCycleIndex % #gates) + 1
+    root.CFrame = target.CFrame + Vector3.new(0, 5, 0)
 end
 
+TeleportBindable.Event:Connect(teleportToNextGate)
+
 local function cleanup()
-    print("GateCycleTP cleared")
-    _G.GateCycleIndex = nil
+    if TeleportBindable then
+        TeleportBindable:Destroy()
+    end
 end
 
 _G[SCRIPT_TAG] = cleanup
-
-print("[GATE CYCLE TP] Загружен! Пиши в чат: gate")
-
-local chatConnection = LocalPlayer.Chatted:Connect(function(msg)
-    local text = msg:lower()
-    if text == "gate" or text == "nextgate" then
-        teleportToNextGate()
-    end
-end)
-
-_G[SCRIPT_TAG .. "_chat"] = chatConnection
