@@ -17,35 +17,25 @@ local function monitorSpeed(character)
     if not humanoid then return end
 
     local function applySpeed()
-        if not _G.SurvivorSpeedToggle then return end
-        if LocalPlayer.Team and LocalPlayer.Team.Name ~= "Survivors" then return end
+        if not _G.SurvivorSpeedToggle then 
+            humanoid.WalkSpeed = 16
+            return 
+        end
+        if LocalPlayer.Team and LocalPlayer.Team.Name ~= "Survivors" then 
+            humanoid.WalkSpeed = 16
+            return 
+        end
+        
         isChangingSpeed = true
-        
-        character:SetAttribute("speedboost", _G.SurvivorSpeed)
-        
-        if humanoid then
-            humanoid:SetAttribute("speedboost", _G.SurvivorSpeed)
-        end
-        
-        local root = character:FindFirstChild("HumanoidRootPart")
-        if root then
-            root:SetAttribute("speedboost", _G.SurvivorSpeed)
-        end
+        humanoid.WalkSpeed = _G.SurvivorSpeed
         isChangingSpeed = false
     end
 
     if _G.SurvivorSpeedConnection then
         _G.SurvivorSpeedConnection:Disconnect()
     end
-    _G.SurvivorSpeedConnection = character:GetAttributeChangedSignal("speedboost"):Connect(function()
-        if _G.ScriptSessionID ~= currentSession then return end
-        if isChangingSpeed then return end
-        if _G.SurvivorSpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
-            applySpeed()
-        end
-    end)
 
-    humanoid:GetAttributeChangedSignal("speedboost"):Connect(function()
+    _G.SurvivorSpeedConnection = humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
         if _G.ScriptSessionID ~= currentSession then return end
         if isChangingSpeed then return end
         if _G.SurvivorSpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Survivors" then
