@@ -637,16 +637,23 @@ local Section = Tab:AddSection({
 --_G.PlayAnimation(135181748009911, true, "walking")
 
 Tab:AddButton({
+	Name = "Stop Emote",
+	Callback = function()
+			_G.StopAnimation()
+  	end    
+})
+
+Tab:AddButton({
 	Name = "Arm Up",
 	Callback = function()
-			_G.PlayAnimation(117042998468241, false, "standing")
+			_G.PlayAnimation(117042998468241, "standing")
   	end    
 })
 
 Tab:AddButton({
 	Name = "LOL",
 	Callback = function()
-			_G.PlayAnimation(129967390, false, "standing")
+			_G.PlayAnimation(129967390, "standing")
   	end    
 })
 -------------------------Shader---------------------------
