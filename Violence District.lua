@@ -658,6 +658,44 @@ Tab:AddButton({
 })
 
 Tab:AddButton({
+	Name = "Attack 2",
+	Callback = function()
+			_G.PlayAnimation(78935059863801, "standing", false, "nonlooped")
+  	end    
+})
+
+Tab:AddButton({
+	Name = "XZ",
+	Callback = function()
+			_G.PlayAnimation(80411309607666, "standing", false, "nonlooped")
+  	end    
+})
+
+Tab:AddButton({
+	Name = "XZ2",
+	Callback = function()
+			_G.PlayAnimation(100092272524635, "standing", false, "nonlooped")
+  	end    
+})
+
+
+Tab:AddButton({
+	Name = "XZ",
+	Callback = function()
+			_G.PlayAnimation(80411309607666, "standing", false, "nonlooped")
+  	end    
+})
+
+
+Tab:AddButton({
+	Name = "XZ",
+	Callback = function()
+			_G.PlayAnimation(80411309607666, "standing", false, "nonlooped")
+  	end    
+})
+
+
+Tab:AddButton({
 	Name = "LOL",
 	Callback = function()
 			_G.PlayAnimation(129967390, "standing", false, "nonlooped")
@@ -672,9 +710,16 @@ Tab:AddButton({
 })
 
 Tab:AddButton({
-	Name = "Kick Generator",
+	Name = "Kick",
 	Callback = function()
 			_G.PlayAnimation(135181748009911, "standing", false, "nonlooped")
+  	end    
+})
+
+Tab:AddButton({
+	Name = "Kick 2",
+	Callback = function()
+			_G.PlayAnimation(77210283630654, "standing", false, "nonlooped")
   	end    
 })
 
@@ -720,6 +765,17 @@ Tab:AddButton({
 			_G.PlayAnimation(116093934008204, "walking", true, "looped")
 			wait(1)
 			_G.PlayAnimation(134758728973154, "standing", true, "looped")
+  	end    
+})
+
+Tab:AddButton({
+	Name = "BUHOI",
+	Callback = function()
+			_G.StopAnimation()
+			wait(1)
+			_G.PlayAnimation(92098503722633, "walking", true, "looped")
+			wait(1)
+			_G.PlayAnimation(96744338559260, "standing", true, "looped")
   	end    
 })
 -------------------------Shader---------------------------
