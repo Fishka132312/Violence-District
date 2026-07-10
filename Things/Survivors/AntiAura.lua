@@ -12,10 +12,10 @@ if _G.AntiAura == nil then
     _G.AntiAura = false
 end
 
-local function disableSprint(char)
+local function disableSprinting(char)
     if not char or not _G.AntiAura then return end
-    if char:GetAttribute("Sprint") == true then
-        char:SetAttribute("Sprint", false)
+    if char:GetAttribute("Sprinting") == true then
+        char:SetAttribute("Sprinting", false)
     end
 end
 
@@ -23,7 +23,7 @@ _G.AntiAuraConnection = RunService.Heartbeat:Connect(function()
     if not _G.AntiAura then return end
     local char = player.Character
     if char then
-        disableSprint(char)
+        disableSprinting(char)
     end
 end)
 
@@ -31,22 +31,22 @@ _G.AntiAuraCharConn = player.CharacterAdded:Connect(function(char)
     if not _G.AntiAura then return end
     
     task.wait(0.1)
-    disableSprint(char)
+    disableSprinting(char)
     
     char.AttributeChanged:Connect(function(attr)
-        if attr == "Sprint" and _G.AntiAura and char:GetAttribute("Sprint") == true then
-            char:SetAttribute("Sprint", false)
+        if attr == "Sprinting" and _G.AntiAura and char:GetAttribute("Sprinting") == true then
+            char:SetAttribute("Sprinting", false)
         end
     end)
 end)
 
 if player.Character then
     local char = player.Character
-    disableSprint(char)
+    disableSprinting(char)
     
     char.AttributeChanged:Connect(function(attr)
-        if attr == "Sprint" and _G.AntiAura and char:GetAttribute("Sprint") == true then
-            char:SetAttribute("Sprint", false)
+        if attr == "Sprinting" and _G.AntiAura and char:GetAttribute("Sprinting") == true then
+            char:SetAttribute("Sprinting", false)
         end
     end)
 end
