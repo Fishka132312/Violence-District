@@ -30,6 +30,7 @@ local scripts = {
 	'Abilities/TheSlasher.lua',
 	'Abilities/TheStalker.lua',
 	'Abilities/TheKiller.lua',
+	'Abilities/TheVeil.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
