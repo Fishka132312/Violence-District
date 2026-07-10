@@ -1,81 +1,81 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local CollectionService = game:GetService("CollectionService")
+
+local LocalPlayer = Players.LocalPlayer
 local SCRIPT_TAG = "EspHooks"
 
 if _G[SCRIPT_TAG] then
     _G[SCRIPT_TAG]()
 end
 
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
+_G.HooksEsp = false
 local HOOK_COLOR = Color3.fromRGB(180, 0, 255)
-
-if _G.HooksEsp == nil then 
-    _G.HooksEsp = false 
-end
 
 local activeHookVisuals = {}
 
-local function getMapFolder()
-    return workspace:FindFirstChild("Map")
+local function isHook(obj)
+    if not obj then return false end
+    
+    if obj.Name == "Hook" or obj.Name == "MeatHook" then return true end
+    
+    if obj:FindFirstChild("HookPoint") or obj:FindFirstChild("Hook") or obj:FindFirstChild("HangingPoint") then 
+        return true 
+    end
+    
+    if CollectionService:HasTag(obj, "Hook") or CollectionService:HasTag(obj, "MeatHook") then 
+        return true 
+    end
+    
+    if obj.Parent and (obj.Parent.Name:find("Hook") or obj.Parent.Name:find("MeatHook")) then
+        return true
+    end
+    
+    if obj:GetAttribute("IsHook") or obj:GetAttribute("Hook") then
+        return true
+    end
+    
+    return false
+end
+
+local function createHookESP(hookTarget)
+    if not _G.HooksEsp then return end
+    
+    local rootPart = hookTarget.PrimaryPart or hookTarget:FindFirstChildWhichIsA("BasePart")
+    if not rootPart then return end
+    
+    if activeHookVisuals[hookTarget] then return end
+    
+    local highlight = Instance.new("Highlight")
+    highlight.Name = "HookHighlight"
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    highlight.FillTransparency = 0.6
+    highlight.OutlineTransparency = 0
+    highlight.FillColor = HOOK_COLOR
+    highlight.OutlineColor = HOOK_COLOR
+    highlight.Parent = hookTarget
+    
+    activeHookVisuals[hookTarget] = highlight
 end
 
 local function removeHookESP(hookTarget)
     if activeHookVisuals[hookTarget] then
-        if activeHookVisuals[hookTarget].Highlight then 
-            activeHookVisuals[hookTarget].Highlight:Destroy() 
-        end
+        activeHookVisuals[hookTarget]:Destroy()
         activeHookVisuals[hookTarget] = nil
     end
 end
 
-local function createHookESP(hookTarget)
-    if not _G.HooksEsp then
-        removeHookESP(hookTarget)
-        return
-    end
-
-    local rootPart = hookTarget:IsA("Model") and (hookTarget.PrimaryPart or hookTarget:FindFirstChildWhichIsA("BasePart")) or hookTarget
-    if not rootPart then return end
-
-    if not activeHookVisuals[hookTarget] then
-        activeHookVisuals[hookTarget] = {}
-    end
-
-    local highlight = activeHookVisuals[hookTarget].Highlight
-    if not highlight or highlight.Parent ~= hookTarget then
-        if highlight then highlight:Destroy() end
-        
-        highlight = Instance.new("Highlight")
-        highlight.Name = "HookHighlight"
-        highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-        highlight.FillTransparency = 0.5
-        highlight.OutlineTransparency = 0
-        highlight.FillColor = HOOK_COLOR
-        highlight.OutlineColor = HOOK_COLOR
-        highlight.Parent = hookTarget
-        activeHookVisuals[hookTarget].Highlight = highlight
-    end
-end
-
-local connection
-connection = RunService.RenderStepped:Connect(function()
-    local mapFolder = getMapFolder()
+local connection = RunService.RenderStepped:Connect(function()
+    if not _G.HooksEsp then return end
     
-    if mapFolder and _G.HooksEsp then
-        for _, obj in ipairs(mapFolder:GetDescendants()) do
-            if obj.Name == "Hook" and (obj:IsA("Model") or obj:IsA("BasePart")) then
-                createHookESP(obj)
-            end
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if isHook(obj) then
+            createHookESP(obj)
         end
-        
-        for hookTarget, _ in pairs(activeHookVisuals) do
-            if not hookTarget or not hookTarget:IsDescendantOf(mapFolder) then
-                removeHookESP(hookTarget)
-            end
-        end
-    else
-        for hookTarget, _ in pairs(activeHookVisuals) do
+    end
+    
+    for hookTarget, _ in pairs(activeHookVisuals) do
+        if not hookTarget or not hookTarget.Parent then
             removeHookESP(hookTarget)
         end
     end
@@ -86,6 +86,7 @@ local function cleanup()
     for hookTarget, _ in pairs(activeHookVisuals) do
         removeHookESP(hookTarget)
     end
+    activeHookVisuals = {}
 end
 
 _G[SCRIPT_TAG] = cleanup
