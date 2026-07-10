@@ -7,6 +7,7 @@ local LocalPlayer = Players.LocalPlayer
 local scripts = {
     'Emotes/Emotes.lua',
 	'Emotes/AnimationSpeed.lua',
+	'Emotes/CustomAnim.lua',
 	'Killer/AutoAttack.lua',
 	'Killer/AutoCarry.lua',
 	'Killer/KillerSpeed.lua',
@@ -26,6 +27,7 @@ local scripts = {
 	'Teleport/TpToGate.lua',
 	'Teleport/TpToGen.lua',
 	'Teleport/TpToHook.lua',
+	'Abilities/TheSlasher.lua',
 }
 
 local baseUrl = 'https://raw.githubusercontent.com/Fishka132312/Violence-District/refs/heads/main/Things/'
@@ -339,6 +341,47 @@ Tab:AddToggle({
 	end    
 })
 
+local Tab = Window:MakeTab({
+	Name = "Abilities",
+	Icon = "rbxassetid://4483345998",
+	PremiumOnly = false
+})
+
+local Section = Tab:AddSection({
+	Name = "The Slasher"
+})
+
+Tab:AddToggle({
+	Name = "Inf Abilities",
+	Default = false,
+	Callback = function(Value)
+		_G.Slasher1 = Value
+	end    
+})
+
+local Section = Tab:AddSection({
+	Name = "The Slasher"
+})
+
+Tab:AddToggle({
+	Name = "Inf Abilities",
+	Default = false,
+	Callback = function(Value)
+		_G.Slasher1 = Value
+	end    
+})
+
+local Section = Tab:AddSection({
+	Name = "The Stalker"
+})
+
+Tab:AddToggle({
+	Name = "Auto Stalking",
+	Default = false,
+	Callback = function(Value)
+		_G.Stalker = Value
+	end    
+})
 -------------------------Survivors---------------------------
 
 local Tab = Window:MakeTab({
@@ -586,6 +629,12 @@ Tab:AddToggle({
     end
 })
 
+Tab:AddButton({
+	Name = "Arm Up",
+	Callback = function()
+			script.Parent.PlayAnimation:Fire(117042998468241)
+  	end    
+})
 -------------------------Shader---------------------------
 
 local Tab = Window:MakeTab({
