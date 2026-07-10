@@ -1,9 +1,7 @@
--- === AUTO ATTACK с Whitelist (не бьёт своих) ===
 if _G.AutoAttackScriptRunning then
     _G.AutoAttackScriptRunning = false
     task.wait(0.3)
 end
-
 _G.AutoAttackScriptRunning = true
 local currentScriptId = os.clock()
 _G.CurrentAutoAttackId = currentScriptId
@@ -29,28 +27,37 @@ local function isInWhitelist(playerName)
     return table.find(_G.Whitelist, playerName) ~= nil
 end
 
+local function isKnocked(character)
+    if not character then return false end
+    return character:GetAttribute("Knocked") == true
+end
+
 local function getClosestPlayer()
     local closestPlayer = nil
     local shortestDistance = MAX_DISTANCE
     local localCharacter = LocalPlayer.Character
+    
     if not localCharacter or not localCharacter:FindFirstChild("HumanoidRootPart") then
         return nil
     end
-
+    
     local localHRP = localCharacter.HumanoidRootPart
-
+    
     for _, player in ipairs(Players:GetPlayers()) do
         if player ~= LocalPlayer then
             local char = player.Character
             local hrp = char and char:FindFirstChild("HumanoidRootPart")
             local humanoid = char and char:FindFirstChild("Humanoid")
-
+            
             if hrp and humanoid and humanoid.Health > 0 then
-                -- Проверяем whitelist
                 if isInWhitelist(player.Name) then
-                    continue  -- Пропускаем игрока из вайтлиста
+                    continue
                 end
-
+                
+                if isKnocked(char) then
+                    continue
+                end
+                
                 local distance = (localHRP.Position - hrp.Position).Magnitude
                 if distance < shortestDistance then
                     shortestDistance = distance
@@ -66,14 +73,12 @@ task.spawn(function()
     while _G.AutoAttackScriptRunning and _G.CurrentAutoAttackId == currentScriptId do
         local onCorrectTeam = LocalPlayer.Team and LocalPlayer.Team.Name == TARGET_TEAM_NAME
         local carrying = isCarryingSomething(LocalPlayer.Character)
-
+        
         if _G.AutoAttackKiller == true and onCorrectTeam and not carrying then
             local target = getClosestPlayer()
             
             if target then
-                -- Атака только если цель НЕ в whitelist (уже проверено выше)
                 AttackRemote:FireServer(unpack(args))
-                print("AutoAttack → " .. target.Name)
             end
             
             task.wait(ATTACK_COOLDOWN)
@@ -82,5 +87,3 @@ task.spawn(function()
         end
     end
 end)
-
-print("AutoAttack с whitelist загружен")
