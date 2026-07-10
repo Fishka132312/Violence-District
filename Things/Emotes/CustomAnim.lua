@@ -1,65 +1,80 @@
 local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-
 local player = Players.LocalPlayer
+
 local character = player.Character or player.CharacterAdded:Wait()
 local humanoid = character:WaitForChild("Humanoid")
 
 local currentTrack = nil
-local moveConnection = nil
+local currentAnimType = nil
+local animConnection = nil
 
-if _G.PlayAnimation then return end
-
-local function stopCurrent()
-    if currentTrack then
-        currentTrack:Stop()
-        currentTrack = nil
-    end
-    if moveConnection then
-        moveConnection:Disconnect()
-        moveConnection = nil
-    end
+local function stopCurrentAnimation()
+	if currentTrack then
+		pcall(function() currentTrack:Stop() end)
+		currentTrack = nil
+	end
+	currentAnimType = nil
+	if animConnection then
+		animConnection:Disconnect()
+		animConnection = nil
+	end
 end
 
-local function PlayAnimation(animId, loop, moveType)
-    stopCurrent()
+local function PlayAnimation(animId, animType)
+	stopCurrentAnimation()
+	if not animId then return end
 
-    local anim = Instance.new("Animation")
-    anim.AnimationId = "rbxassetid://" .. tostring(animId)
+	local anim = Instance.new("Animation")
+	anim.AnimationId = "rbxassetid://" .. tostring(animId)
+	currentTrack = humanoid:LoadAnimation(anim)
+	currentAnimType = animType
 
-    currentTrack = humanoid:LoadAnimation(anim)
-    currentTrack.Priority = Enum.AnimationPriority.Movement
+	if currentAnimType == "standing" or currentAnimType == "walking" then
+		currentTrack.Looped = true
+	end
 
-    if loop ~= false then
-        currentTrack.Looped = true
-    end
+	if currentAnimType == "standing" then
+		if humanoid.MoveDirection.Magnitude < 0.1 then
+			currentTrack:Play()
+		end
+	elseif currentAnimType == "walking" then
+		if humanoid.MoveDirection.Magnitude > 0.1 then
+			currentTrack:Play()
+		end
+	else
+		currentTrack:Play()
+		currentAnimType = nil
+		return
+	end
 
-    currentTrack:Play()
+	animConnection = humanoid.Running:Connect(function(speed)
+		if not currentTrack or not currentAnimType then return end
 
-    if moveType == "standing" or moveType == "walking" then
-        moveConnection = RunService.Heartbeat:Connect(function()
-            local isMoving = humanoid.MoveDirection.Magnitude > 0.1
+		local isMoving = speed > 0.1
 
-            local shouldPlay = false
-            if moveType == "standing" then
-                shouldPlay = not isMoving
-            elseif moveType == "walking" then
-                shouldPlay = isMoving
-            end
+		if currentAnimType == "standing" then
+			if isMoving and currentTrack.IsPlaying then
+				stopCurrentAnimation()
+			end
 
-            if shouldPlay then
-                if currentTrack and not currentTrack.IsPlaying then
-                    currentTrack.TimePosition = 0
-                    currentTrack:Play()
-                end
-            else
-                if currentTrack and currentTrack.IsPlaying then
-                    currentTrack:Stop()
-                end
-            end
-        end)
-    end
+		elseif currentAnimType == "walking" then
+			if isMoving then
+				if not currentTrack.IsPlaying then
+					currentTrack:Play()
+				end
+			else
+				if currentTrack.IsPlaying then
+					currentTrack:Stop()
+				end
+			end
+		end
+	end)
 end
 
 _G.PlayAnimation = PlayAnimation
-_G.StopAnimation = stopCurrent
+
+player.CharacterAdded:Connect(function(char)
+	character = char
+	humanoid = char:WaitForChild("Humanoid")
+	stopCurrentAnimation()
+end)
