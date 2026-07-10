@@ -629,10 +629,24 @@ Tab:AddToggle({
     end
 })
 
+local Section = Tab:AddSection({
+	Name = "Custom Emote"
+})
+
+--_G.PlayAnimation(135084204086504, false, "standing")
+--_G.PlayAnimation(135181748009911, true, "walking")
+
 Tab:AddButton({
 	Name = "Arm Up",
 	Callback = function()
-			script.Parent.PlayAnimation:Fire(117042998468241)
+			_G.PlayAnimation(117042998468241, false, "standing")
+  	end    
+})
+
+Tab:AddButton({
+	Name = "LOL",
+	Callback = function()
+			_G.PlayAnimation(129967390, false, "standing")
   	end    
 })
 -------------------------Shader---------------------------
