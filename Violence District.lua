@@ -371,8 +371,8 @@ local Section = Tab:AddSection({
 })
 
 Tab:AddDropdown({Name = "Select Sound", Default = _G.SelectedSound or (_G.SoundOptions and _G.SoundOptions[1]) or "Sound 1", Options = _G.SoundOptions or {"Sound 1", "Sound 2", "Sound 3"}, Callback = function(Value) _G.SelectedSound = Value end})
-Tab:AddTextbox({Name = "Volume", Default = _G.Volume or "0.5", TextDisappear = true, Callback = function(Value) _G.Volume = Value end})
-Tab:AddTextbox({Name = "Distance", Default = _G.Distance or "50", TextDisappear = true, Callback = function(Value) _G.Distance = Value end})
+Tab:AddTextbox({Name = "Volume", Default = _G.Volume or "0.5", TextDisappear = false, Callback = function(Value) _G.Volume = Value end})
+Tab:AddTextbox({Name = "Distance", Default = _G.Distance or "50", TextDisappear = false, Callback = function(Value) _G.Distance = Value end})
 Tab:AddButton({Name = "Play Sound", Callback = function() if _G.PlaySound then _G.PlaySound() end end})
 -------------------------Survivors---------------------------
 
@@ -490,7 +490,7 @@ if signal then signal:Fire() end
 Tab:AddTextbox({
     Name = "Generator Keybing",
     Default = "G",
-    TextDisappear = true,
+    TextDisappear = false,
     Callback = function(Value)
         local success, key = pcall(function()
             return Enum.KeyCode[Value]
@@ -512,7 +512,7 @@ if signal then signal:Fire() end
 Tab:AddTextbox({
     Name = "Hook Keybind",
     Default = "V",
-    TextDisappear = true,
+    TextDisappear = false,
     Callback = function(Value)
         local success, key = pcall(function()
             return Enum.KeyCode[Value]
@@ -534,7 +534,7 @@ if signal then signal:Fire() end
 Tab:AddTextbox({
     Name = "Gate Keybing",
     Default = "H",
-    TextDisappear = true,
+    TextDisappear = false,
     Callback = function(Value)
         local success, key = pcall(function()
             return Enum.KeyCode[Value]
@@ -682,9 +682,9 @@ Tab:AddButton({
 	Name = "Ползать",
 	Callback = function()
 			_G.StopAnimation()
-			wait(0.1)
+			wait(1)
 			_G.PlayAnimation(78719043959654, "walking", true, "looped")
-			wait(0.1)
+			wait(1)
 			_G.PlayAnimation(126526181422628, "standing", true, "looped")
   	end    
 })
@@ -693,9 +693,9 @@ Tab:AddButton({
 	Name = "Injured",
 	Callback = function()
 			_G.StopAnimation()
-			wait(0.1)
+			wait(1)
 			_G.PlayAnimation(135084204086504, "walking", true, "looped")
-			wait(0.1)
+			wait(1)
 			_G.PlayAnimation(72208365305487, "standing", true, "looped")
   	end    
 })
@@ -704,9 +704,9 @@ Tab:AddButton({
 	Name = "RUNNNN",
 	Callback = function()
 			_G.StopAnimation()
-			wait(0.1)
+			wait(1)
 			_G.PlayAnimation(116093934008204, "walking", true, "looped")
-			wait(0.1)
+			wait(1)
 			_G.PlayAnimation(134758728973154, "standing", true, "looped")
   	end    
 })
