@@ -679,9 +679,32 @@ Tab:AddButton({
 })
 
 Tab:AddButton({
-	Name = "Walking Enjure",
+	Name = "Cracking",
 	Callback = function()
-			_G.PlayAnimation(140463265233127, "walking", true, "looped")
+			_G.PlayAnimation(91619171958082, "standing", true, "looped")
+  	end    
+})
+
+
+local Section = Tab:AddSection({
+	Name = "Animation Packs"
+})
+
+Tab:AddButton({
+	Name = "Ползать",
+	Callback = function()
+			_G.PlayAnimation(78719043959654, "walking", true, "looped")
+			wait(0.1)
+			_G.PlayAnimation(126526181422628, "standing", true, "looped")
+  	end    
+})
+
+Tab:AddButton({
+	Name = "Injured",
+	Callback = function()
+			_G.PlayAnimation(135084204086504, "walking", true, "looped")
+			wait(0.1)
+			_G.PlayAnimation(72208365305487, "standing", true, "looped")
   	end    
 })
 -------------------------Shader---------------------------
