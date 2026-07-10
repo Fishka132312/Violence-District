@@ -301,44 +301,44 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
 Tab:AddSlider({
-	Name = "Killer Speed",
-	Min = 0,
-	Max = 100,
-	Default = 5,
-	Color = Color3.fromRGB(255,255,255),
-	Increment = 1,
-	ValueName = "speed",
-	Callback = function(Value)
-		_G.KillerSpeed = Value
-		
-		local character = LocalPlayer.Character
-		if character then
-			local humanoid = character:FindFirstChild("Humanoid")
-			if humanoid and _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
-				humanoid.WalkSpeed = Value
-			end
-		end
-	end    
+    Name = "Killer Speed",
+    Min = 0,
+    Max = 100,
+    Default = 25,
+    Color = Color3.fromRGB(255,255,255),
+    Increment = 1,
+    ValueName = "speed",
+    Callback = function(Value)
+        _G.KillerSpeed = Value
+        
+        local char = LocalPlayer.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum and _G.SpeedToggle and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+                hum.WalkSpeed = Value
+            end
+        end
+    end
 })
 
 Tab:AddToggle({
-	Name = "Apply speed",
-	Default = false,
-	Callback = function(Value)
-		_G.SpeedToggle = Value
-		
-		local character = LocalPlayer.Character
-		if character then
-			local humanoid = character:FindFirstChild("Humanoid")
-			if humanoid then
-				if Value and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
-					humanoid.WalkSpeed = _G.KillerSpeed
-				else
-					humanoid.WalkSpeed = 16
-				end
-			end
-		end
-	end    
+    Name = "Apply speed",
+    Default = false,
+    Callback = function(Value)
+        _G.SpeedToggle = Value
+        
+        local char = LocalPlayer.Character
+        if char then
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                if Value and LocalPlayer.Team and LocalPlayer.Team.Name == "Killer" then
+                    hum.WalkSpeed = _G.KillerSpeed
+                else
+                    hum.WalkSpeed = 16
+                end
+            end
+        end
+    end
 })
 
 local Tab = Window:MakeTab({
