@@ -995,4 +995,5 @@ local MyToggle = CustomAnimationsSection:Toggle({
 })
 local SettingsCat = Window:Category("Settings")
 local SettingsPage = Library:CreateSettingsPage(Window, KeybindList)
+table.insert(SettingsCat.Elements, SettingsPage)
 Window:Init()
