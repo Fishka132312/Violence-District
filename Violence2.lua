@@ -76,10 +76,11 @@ local Window = Library:Window({
 -------------------------Main-----------------------
 
 local MainCat = Window:Category("Main")
-
-local MainPage = Window:Page({Name = "Main", Icon = "7539983773"})
-
-MainCat.Elements[#MainCat.Elements + 1] = MainPage
+local MainPage = Window:Page({
+		Name = "Main",
+		Icon = "7539983773",
+		Category = MainCat
+})
 
 --PlayerInfo--
 local MainSection = MainPage:Section({Name = "Show Player Info", Side = 1})
@@ -167,10 +168,11 @@ local MyToggle = LightningSection:Toggle({
 -------------------------Visual-----------------------
 
 local VisualCat = Window:Category("Visual")
-
-local VisualPage = Window:Page({Name = "Visual", Icon = "116707863154642"})
-
-VisualCat.Elements[#VisualCat.Elements + 1] = VisualPage
+local VisualPage = Window:Page({
+		Name = "Visual",
+		Icon = "116707863154642",
+		Category = VisualCat
+})
 
 --players--
 local PlayersSection = VisualPage:Section({Name = "Players", Side = 1})
@@ -235,10 +237,11 @@ local MyToggle = ThingsSection:Toggle({
 -------------------------Killer-----------------------
 
 local KillerCat = Window:Category("Killer")
-
-local KillerPage = Window:Page({Name = "Killer", Icon = "6187718252"})
-
-KillerCat.Elements[#KillerCat.Elements + 1] = KillerPage
+local KillerPage = Window:Page({
+		Name = "Killer",
+		Icon = "6187718252",
+		Category = KillerCat
+})
 
 --Whitelisht--
 local WhitelistSection = KillerPage:Section({Name = "Whitelist", Side = 1})
@@ -369,9 +372,11 @@ local MyToggle = MainSection:Toggle({
 
 --------------------Abilities-----------------------
 
-local AbilitiesPage = Window:Page({Name = "Abilities", Icon = "6723742952"})
-
-KillerCat.Elements[#KillerCat.Elements + 1] = AbilitiesPage
+local AbilitiesPage = Window:Page({
+		Name = "Abilities",
+		Icon = "6723742952",
+		Category = KillerCat
+})
 
 --Killers--
 local KillersSection = AbilitiesPage:Section({Name = "Killers", Side = 1})
@@ -466,10 +471,11 @@ KillersSection:Button({
 -------------------------Survivors-----------------------
 
 local SurvivorsCat = Window:Category("Survivors")
-
-local SurvivorPage = Window:Page({Name = "Survivor", Icon = "90807912793699"})
-
-SurvivorsCat.Elements[#SurvivorsCat.Elements + 1] = SurvivorPage
+local SurvivorPage = Window:Page({
+		Name = "Survivor",
+		Icon = "90807912793699",
+		Category = SurvivorsCat
+})
 
 --AutoFarm--
 local AutoFarmSection = SurvivorPage:Section({Name = "AutoFarm", Side = 1})
@@ -570,11 +576,12 @@ local MyToggle = ThingsSection:Toggle({
     end
 })
 
+-------------------Teleport--------------------
 local TeleportCat = Window:Category("Teleport")
-
-local TeleportPage = Window:Page({Name = "Teleport", Icon = "5160482784"})
-
-TeleportCat.Elements[#TeleportCat.Elements + 1] = TeleportPage
+local TeleportPage = Window:Page({Name = "Teleport",
+		Icon = "5160482784",
+		Category = TeleportCat
+})
 
 --Players--
 local PlayersSection = TeleportPage:Section({Name = "Players", Side = 1})
@@ -735,10 +742,10 @@ ThingsSection:Keybind({
 ------------------------Emotes-------------------------
 
 local EmotesCat = Window:Category("Emotes/Animations")
-
-local EmotesPage = Window:Page({Name = "Emotes", Icon = "110748588642372"})
-
-EmotesCat.Elements[#EmotesCat.Elements + 1] = EmotesPage
+local EmotesPage = Window:Page({
+		Name = "Emotes",
+		Icon = "110748588642372",
+		Category = EmotesCat})
 
 --Game Emotes--
 local GameEmotesSection = EmotesPage:Section({Name = "Game Emotes", Side = 1})
@@ -886,9 +893,11 @@ CustomEmotesSection:Button({
 
 ------------------------Animations-------------------------
 
-local AnimationsPage = Window:Page({Name = "Animations", Icon = "110748588642372"})
-
-EmotesCat.Elements[#EmotesCat.Elements + 1] = AnimationsPage
+local AnimationsPage = Window:Page({
+		Name = "Animations",
+		Icon = "110748588642372",
+		Category = EmotesCat
+})
 
 --Game Emotes--
 local CustomAnimationsSection = AnimationsPage:Section({Name = "Custom Animations", Side = 1})
@@ -986,5 +995,4 @@ local MyToggle = CustomAnimationsSection:Toggle({
 })
 local SettingsCat = Window:Category("Settings")
 local SettingsPage = Library:CreateSettingsPage(Window, KeybindList)
-SettingsCat.Elements[#SettingsCat.Elements + 1] = SettingsPage
 Window:Init()
