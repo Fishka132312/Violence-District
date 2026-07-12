@@ -617,24 +617,39 @@ ThingsSection:Button({
     end
 })
 
-ThingsSection:Keybind({
-    Name = "Gen Keybind",
-    Flag = "Gen_Teleport_Bind",
-    Default = Enum.KeyCode.G,
-    Mode = "Toggle",
-    Callback = function(State)
-        if State then
-            local signal = LocalPlayer.PlayerGui:FindFirstChild("GenTeleportSignal")
-            if signal then
-                signal:Fire()
+ThingsSection:Textbox({
+    Flag = "GenKeybind",
+    Default = "G",
+    Placeholder = "Enter the keyиbind",
+    Numeric = false,
+    Finished = true,
+    Callback = function(Value)
+        if not Value or Value == "" then
+            return
+        end
+        
+        Value = Value:upper():gsub("%s+", "")
+        
+        local success, keyCode = pcall(function()
+            return Enum.KeyCode[Value]
+        end)
+        
+        if success and keyCode then
+            if _G.GenTeleportSetKey then
+                _G.GenTeleportSetKey(keyCode)
                 
-                Library:Notification({
-                    Title = "TP",
-                    Description = "Телепортирован к генератору!",
+                game:GetService("StarterGui"):SetCore("SendNotification", {
+                    Title = "Gen Teleport",
+                    Text = "Keybind изменён на: " .. Value,
                     Duration = 2,
-                    Icon = "73789337996373"
                 })
             end
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Gen Teleport",
+                Text = "Ошибка: клавиша " .. Value .. " не найдена",
+                Duration = 3,
+            })
         end
     end
 })
@@ -667,24 +682,39 @@ ThingsSection:Button({
     end
 })
 
-ThingsSection:Keybind({
-    Name = "Hook Keybind",
-    Flag = "Hook_Teleport_Bind",
-    Default = Enum.KeyCode.V,
-    Mode = "Toggle",
-    Callback = function(State)
-        if State then
-            local signal = LocalPlayer.PlayerGui:FindFirstChild("HookTeleportSignal")
-            if signal then
-                signal:Fire()
+ThingsSection:Textbox({
+    Flag = "HookKeybind",
+    Default = "V",
+    Placeholder = "Enter the keybind",
+    Numeric = false,
+    Finished = true,
+    Callback = function(Value)
+        if not Value or Value == "" then
+            return
+        end
+        
+        Value = Value:upper():gsub("%s+", "")
+        
+        local success, keyCode = pcall(function()
+            return Enum.KeyCode[Value]
+        end)
+        
+        if success and keyCode then
+            if _G.HookTeleportSetKey then
+                _G.HookTeleportSetKey(keyCode)
                 
-                Library:Notification({
-                    Title = "TP",
-                    Description = "Телепортирован к хуку!",
+                game:GetService("StarterGui"):SetCore("SendNotification", {
+                    Title = "Hook Teleport",
+                    Text = "Keybind изменён на: " .. Value,
                     Duration = 2,
-                    Icon = "73789337996373"
                 })
             end
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Hook Teleport",
+                Text = "Неверная клавиша: " .. Value .. "\nПопробуй H, E, F, V, Q и т.д.",
+                Duration = 3,
+            })
         end
     end
 })
@@ -717,28 +747,39 @@ ThingsSection:Button({
     end
 })
 
-ThingsSection:Keybind({
-    Name = "Gate Keybind",
-    Flag = "Gate_Teleport_Bind",
-    Default = Enum.KeyCode.H,
-    Mode = "Toggle",
-    Callback = function(State)
-        if State then
-            local signal = LocalPlayer.PlayerGui:FindFirstChild("GateTeleportSignal")
-            if signal then
-                signal:Fire()
-                
-                Library:Notification({
-                    Title = "TP",
-                    Description = "Телепортирован к выходу!",
-                    Duration = 2,
-                    Icon = "73789337996373"
-                })
-            end
+ThingsSection:Textbox({
+    Flag = "GateKeybind",
+    Default = "H",
+    Placeholder = "Enter keybind",
+    Numeric = false,
+    Finished = true,
+    Callback = function(Value)
+        if not Value or Value == "" then
+            return
+        end
+        
+        Value = Value:upper():gsub("%s+", "")
+        
+        local success, keyCode = pcall(function()
+            return Enum.KeyCode[Value]
+        end)
+        
+        if success and keyCode then
+            _G.GateTeleportSetKey(keyCode)
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Gate Teleport",
+                Text = "Keybind changed to: " .. Value,
+                Duration = 2,
+            })
+        else
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Gate Teleport",
+                Text = "Invalid key: " .. Value,
+                Duration = 3,
+            })
         end
     end
 })
-
 ------------------------Emotes-------------------------
 
 local EmotesCat = Window:Category("Emotes/Animations")
