@@ -1,4 +1,4 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Fishka132312/MeowlGui/refs/heads/main/source/library.lua"))()
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Fishka132312/MeowlGui/refs/heads/main/source/library.lua"))() --12321
 local CheatName = "Violence District"
 
 local Players = game:GetService("Players")
@@ -24,7 +24,7 @@ local scripts = {
 	'Survivors/AutoSkillCheck.lua',
 	'Survivors/DisCollision.lua',
 	'Survivors/AntiAura.lua',
-	'Survivora/PANICTP.lua',
+	'Survivors/PANICTP.lua',
   'Teleport/TpToGate.lua',
 	'Teleport/TpToGen.lua',
 	'Teleport/TpToHook.lua',
@@ -530,7 +530,7 @@ local MyToggle = ThingsSection:Toggle({
 
 local MyToggle = ThingsSection:Toggle({
     Name = "Disable Collision",
-    Flag = "DisableCollision ",
+    Flag = "DisableCollision",
     Default = false,
     Callback = function(Value)
        _G.DisableCollision  = Value
