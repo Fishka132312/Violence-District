@@ -1,0 +1,154 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local currentTrack = nil
+local currentAnimType = nil
+local currentPersist = false
+local currentLoopMode = nil
+local animationStarted = false
+local animConnection = nil
+local stoppedConnection = nil
+local ignoreNextStopped = false
+
+local activeTracks = {}
+
+local function stopCurrentAnimation(animIdToKeep)
+    for id, track in pairs(activeTracks) do
+        if not animIdToKeep or tostring(id) ~= tostring(animIdToKeep) then
+            pcall(function()
+                if track and track.IsPlaying then
+                    track:Stop()
+                end
+            end)
+            activeTracks[id] = nil
+        end
+    end
+    
+    if not animIdToKeep then
+        currentAnimType = nil
+        currentPersist = false
+        currentLoopMode = nil
+        animationStarted = false
+        ignoreNextStopped = false
+        
+        if animConnection then
+            pcall(function() animConnection:Disconnect() end)
+            animConnection = nil
+        end
+        if stoppedConnection then
+            pcall(function() stoppedConnection:Disconnect() end)
+            stoppedConnection = nil
+        end
+    end
+end
+
+local function StopSpecificAnimation(animId)
+    if not animId then
+        stopCurrentAnimation()
+        return
+    end
+    local id = tostring(animId)
+    local track = activeTracks[id]
+    if track then
+        pcall(function()
+            if track.IsPlaying then
+                track:Stop()
+            end
+        end)
+        activeTracks[id] = nil
+    end
+end
+
+local function PlayAnimation(animId, animType, persist, loopMode)
+    if not animId then return end
+
+    local anim = Instance.new("Animation")
+    anim.AnimationId = "rbxassetid://" .. tostring(animId)
+    currentTrack = humanoid:LoadAnimation(anim)
+    activeTracks[tostring(animId)] = currentTrack
+    currentAnimType = animType
+    currentPersist = persist or false
+    currentLoopMode = loopMode or "nonlooped"
+    animationStarted = false
+    ignoreNextStopped = false
+
+    if currentAnimType == "standing" or currentAnimType == "walking" then
+        currentTrack.Looped = (currentLoopMode == "looped")
+    else
+        currentTrack.Looped = (currentLoopMode == "looped")
+    end
+
+    local isCorrectStateNow = false
+    if currentAnimType == "standing" then
+        isCorrectStateNow = humanoid.MoveDirection.Magnitude < 0.1
+    elseif currentAnimType == "walking" then
+        isCorrectStateNow = humanoid.MoveDirection.Magnitude > 0.1
+    end
+
+    if isCorrectStateNow then
+        currentTrack:Play()
+        animationStarted = true
+    end
+
+    if currentAnimType ~= "standing" and currentAnimType ~= "walking" then
+        currentTrack:Play()
+        return
+    end
+
+    animConnection = humanoid.Running:Connect(function(speed)
+        if not currentTrack or not currentAnimType then return end
+
+        local isMoving = speed > 0.1
+        local stateIsCorrect = false
+        if currentAnimType == "standing" then
+            stateIsCorrect = not isMoving
+        elseif currentAnimType == "walking" then
+            stateIsCorrect = isMoving
+        end
+
+        if stateIsCorrect then
+            if not currentTrack.IsPlaying then
+                if currentPersist or animationStarted then
+                    currentTrack:Play()
+                    animationStarted = true
+                end
+            end
+        else
+            if currentTrack.IsPlaying then
+                if currentPersist then
+                    ignoreNextStopped = true
+                    currentTrack:Stop()
+                else
+                    stopCurrentAnimation(currentAnimType)
+                end
+            end
+        end
+    end)
+
+    stoppedConnection = currentTrack.Stopped:Connect(function()
+        if ignoreNextStopped then
+            ignoreNextStopped = false
+            return
+        end
+        stopCurrentAnimation()
+    end)
+end
+
+local function StopAnimation(animId)
+    if animId then
+        StopSpecificAnimation(animId)
+    else
+        stopCurrentAnimation()
+    end
+end
+
+_G.PlayAnimation = PlayAnimation
+_G.StopAnimation = StopAnimation
+
+player.CharacterAdded:Connect(function(char)
+    character = char
+    humanoid = char:WaitForChild("Humanoid")
+    stopCurrentAnimation()
+end)
