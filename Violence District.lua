@@ -28,6 +28,7 @@ local scripts = {
   'Teleport/TpToGate.lua',
 	'Teleport/TpToGen.lua',
 	'Teleport/TpToHook.lua',
+	'Teleport/TpToSur.lua',
   'Emotes/Emotes.lua',
 	'Emotes/AnimationSpeed.lua',
   'Emotes/CustomAnim.lua',
@@ -779,6 +780,68 @@ ThingsSection:Textbox({
             })
         end
     end
+})
+
+ThingsSection:Button({
+	Name = "Tp To Survivor",
+	Callback = function()
+		local Players = game:GetService("Players")
+		local LocalPlayer = Players.LocalPlayer
+
+		local signal = LocalPlayer.PlayerGui:FindFirstChild("SurvivorTeleportSignal")
+
+		if signal then
+			signal:Fire()
+
+			Library:Notification({
+				Title = "TP",
+				Description = "Телепортирован к случайному выжившему!",
+				Duration = 3,
+				Icon = "73789337996373"
+			})
+		else
+			Library:Notification({
+				Title = "Ошибка",
+				Description = "Сигнал SurvivorTeleportSignal не найден!",
+				Duration = 4,
+				Icon = "73789337996373"
+			})
+		end
+	end
+})
+
+ThingsSection:Textbox({
+	Flag = "SurvivorKeybind",
+	Default = "H",
+	Placeholder = "Enter keybind",
+	Numeric = false,
+	Finished = true,
+	Callback = function(Value)
+		if not Value or Value == "" then
+			return
+		end
+
+		Value = Value:upper():gsub("%s+", "")
+
+		local success, keyCode = pcall(function()
+			return Enum.KeyCode[Value]
+		end)
+
+		if success and keyCode then
+			_G.SurvivorTeleportSetKey(keyCode)
+			game:GetService("StarterGui"):SetCore("SendNotification", {
+				Title = "Survivor Teleport",
+				Text = "Keybind changed to: " .. Value,
+				Duration = 2,
+			})
+		else
+			game:GetService("StarterGui"):SetCore("SendNotification", {
+				Title = "Survivor Teleport",
+				Text = "Invalid key: " .. Value,
+				Duration = 3,
+			})
+		end
+	end
 })
 ------------------------Emotes-------------------------
 
